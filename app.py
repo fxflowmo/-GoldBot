@@ -1,1665 +1,1516 @@
 # ============================================================
-# GOLD INSTITUTIONAL EDGE V2.0
-# Single-file Streamlit app — deploy free on Streamlit Cloud
+# GOLD INSTITUTIONAL EDGE — LIVE DASHBOARD
+# Full single-page functional site with live data
 # ============================================================
 
 import streamlit as st
+import yfinance as yf
+import pandas as pd
+import numpy as np
+import requests
+import plotly.graph_objects as go
+from datetime import datetime, date
+import pytz
+import time
 
 st.set_page_config(
-    page_title="Gold Institutional Edge — V2.0",
+    page_title="Gold Institutional Edge",
     page_icon="🏅",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
 
+# ── FULL CSS ─────────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
 :root {
   --gold: #C9922A;
   --gold-light: #F0C060;
-  --gold-pale: #FDF5E0;
-  --gold-dark: #7A5510;
-  --bg: #0D0D0D;
-  --bg2: #141414;
-  --bg3: #1C1C1C;
-  --bg4: #242424;
-  --border: rgba(201,146,42,0.18);
-  --border-strong: rgba(201,146,42,0.4);
+  --bg: #080B12;
+  --bg2: #0D1117;
+  --bg3: #131920;
+  --bg4: #1A2332;
+  --border: rgba(201,146,42,0.15);
+  --border-strong: rgba(201,146,42,0.35);
   --text: #E8E6DE;
-  --text2: #A8A49A;
-  --text3: #6A6660;
-  --green: #3DAA6A;
-  --green-bg: rgba(61,170,106,0.1);
-  --red: #D44;
-  --red-bg: rgba(221,68,68,0.1);
+  --text2: #8A9BB0;
+  --text3: #4A5A6A;
+  --green: #00D395;
+  --green-dim: rgba(0,211,149,0.1);
+  --green-border: rgba(0,211,149,0.25);
+  --red: #FF4D6A;
+  --red-dim: rgba(255,77,106,0.1);
+  --red-border: rgba(255,77,106,0.25);
   --blue: #4A9EDB;
-  --blue-bg: rgba(74,158,219,0.1);
-  --amber: #E09A2A;
-  --amber-bg: rgba(224,154,42,0.1);
-  --purple: #9B6FD4;
-  --purple-bg: rgba(155,111,212,0.1);
+  --blue-dim: rgba(74,158,219,0.1);
+  --amber: #F0A030;
+  --amber-dim: rgba(240,160,48,0.1);
   --mono: 'JetBrains Mono', monospace;
   --sans: 'DM Sans', system-ui, sans-serif;
 }
 
-* { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-body, .stApp {
+html, body, .stApp {
   font-family: var(--sans) !important;
-  background: #0D0D0D !important;
+  background: var(--bg) !important;
   color: var(--text) !important;
   -webkit-font-smoothing: antialiased;
 }
 
 #MainMenu, footer, header { visibility: hidden; }
 .block-container { padding: 0 !important; max-width: 100% !important; }
+section[data-testid="stSidebar"] { display: none; }
 
-.v2-header {
+/* ── TOPBAR ── */
+.topbar {
   background: var(--bg2);
   border-bottom: 1px solid var(--border);
-  padding: 48px 60px 40px;
-  position: relative;
-  overflow: hidden;
-}
-.v2-header::before {
-  content: '';
-  position: absolute;
-  top: -60px; right: -60px;
-  width: 300px; height: 300px;
-  background: radial-gradient(circle, rgba(201,146,42,0.06) 0%, transparent 70%);
-  pointer-events: none;
-}
-.header-tag {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.15em;
-  color: var(--gold);
-  text-transform: uppercase;
-  margin-bottom: 12px;
+  padding: 14px 32px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
-.header-tag::before {
-  content: '';
-  display: inline-block;
-  width: 24px; height: 1px;
-  background: var(--gold);
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.topbar-logo {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold-light);
+  letter-spacing: 0.05em;
 }
-.v2-header h1 {
-  font-size: 36px;
-  font-weight: 600;
-  color: var(--text);
-  letter-spacing: -0.02em;
-  line-height: 1.15;
-  margin-bottom: 8px;
+.topbar-version {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: 4px;
 }
-.v2-header h1 span { color: var(--gold-light); }
-.header-sub {
-  font-size: 15px;
-  color: var(--text2);
-  max-width: 560px;
-  margin-bottom: 24px;
-}
-.version-badge {
-  display: inline-flex;
+.topbar-right { display: flex; align-items: center; gap: 16px; }
+.live-badge {
+  display: flex;
   align-items: center;
   gap: 6px;
-  background: var(--amber-bg);
-  border: 1px solid var(--border-strong);
-  color: var(--gold-light);
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--green);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.live-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: blink 1.4s infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+.topbar-time {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+}
+
+/* ── PAGE WRAPPER ── */
+.page { padding: 24px 32px 60px; max-width: 1400px; margin: 0 auto; }
+
+/* ── HERO SIGNAL BANNER ── */
+.hero-bull {
+  background: linear-gradient(135deg, rgba(0,211,149,0.08) 0%, rgba(0,211,149,0.03) 100%);
+  border: 1px solid var(--green-border);
+  border-left: 4px solid var(--green);
+  border-radius: 12px;
+  padding: 24px 32px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.hero-bear {
+  background: linear-gradient(135deg, rgba(255,77,106,0.08) 0%, rgba(255,77,106,0.03) 100%);
+  border: 1px solid var(--red-border);
+  border-left: 4px solid var(--red);
+  border-radius: 12px;
+  padding: 24px 32px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.hero-neutral {
+  background: linear-gradient(135deg, rgba(240,160,48,0.08) 0%, rgba(240,160,48,0.03) 100%);
+  border: 1px solid rgba(240,160,48,0.25);
+  border-left: 4px solid var(--amber);
+  border-radius: 12px;
+  padding: 24px 32px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.hero-left { display: flex; align-items: center; gap: 20px; }
+.hero-icon { font-size: 40px; line-height: 1; }
+.hero-direction {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.hero-sub {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.5;
+}
+.hero-right { display: flex; gap: 12px; flex-wrap: wrap; }
+.hero-tag {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-family: var(--mono);
+  font-size: 11px;
+  text-align: center;
+}
+.hero-tag-label { color: var(--text3); margin-bottom: 2px; }
+.hero-tag-value { color: var(--text); font-weight: 700; font-size: 13px; }
+
+/* ── SCORE BAR ── */
+.score-bar-wrap {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 24px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.score-num-big {
+  font-family: var(--mono);
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1;
+}
+.score-label-area { flex: 1; min-width: 160px; }
+.score-title { font-size: 13px; color: var(--text2); margin-bottom: 6px; }
+.score-bar-bg {
+  height: 8px;
+  background: var(--bg4);
+  border-radius: 4px;
+  overflow: hidden;
+  flex: 1;
+  min-width: 120px;
+}
+.score-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+.score-verdict {
   font-family: var(--mono);
   font-size: 11px;
   padding: 4px 12px;
   border-radius: 20px;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
-.v2-main {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 48px 60px 80px;
+/* ── METRIC GRID ── */
+.metric-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
 }
+.metric-row-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.metric-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  position: relative;
+  overflow: hidden;
+}
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--border);
+}
+.metric-card.bull::before { background: var(--green); }
+.metric-card.bear::before { background: var(--red); }
+.metric-card.gold::before { background: var(--gold); }
+.metric-card.blue::before { background: var(--blue); }
+.metric-card.amber::before { background: var(--amber); }
 
-.section-label {
+.mc-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 8px;
+}
+.mc-value {
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.mc-sub {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 4px;
+}
+.mc-green { color: var(--green) !important; }
+.mc-red   { color: var(--red)   !important; }
+.mc-gold  { color: var(--gold-light) !important; }
+.mc-blue  { color: var(--blue)  !important; }
+.mc-amber { color: var(--amber) !important; }
+
+/* ── SECTION HEADER ── */
+.sec-head {
   font-family: var(--mono);
   font-size: 10px;
   letter-spacing: 0.18em;
+  text-transform: uppercase;
   color: var(--gold);
-  text-transform: uppercase;
-  margin-bottom: 10px;
-  display: block;
-}
-.v2-h2 {
-  font-size: 24px;
-  font-weight: 500;
-  letter-spacing: -0.015em;
-  color: var(--text);
-  margin-bottom: 20px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border);
-}
-.v2-h3 {
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--text);
-  margin: 28px 0 12px;
-}
-.v2-p {
-  color: var(--text2);
-  margin-bottom: 16px;
-  font-size: 15px;
-  line-height: 1.7;
-}
-
-.upgrade-banner {
-  background: var(--amber-bg);
-  border: 1px solid var(--border-strong);
-  border-radius: 10px;
-  padding: 16px 20px;
-  margin-bottom: 24px;
+  margin-bottom: 12px;
+  margin-top: 28px;
   display: flex;
-  gap: 12px;
-  align-items: flex-start;
-}
-.upgrade-icon { font-size: 16px; margin-top: 1px; flex-shrink: 0; }
-.upgrade-title {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  color: var(--gold-light);
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-.upgrade-text { font-size: 13px; color: var(--text2); margin: 0; }
-
-.code-block {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 20px 24px;
-  font-family: var(--mono);
-  font-size: 12px;
-  line-height: 1.7;
-  color: var(--text2);
-  overflow-x: auto;
-  margin: 16px 0;
-  white-space: pre;
-}
-.c-gold   { color: var(--gold-light); }
-.c-green  { color: var(--green); }
-.c-red    { color: #DD4444; }
-.c-blue   { color: var(--blue); }
-.c-amber  { color: var(--amber); }
-.c-purple { color: var(--purple); }
-.c-dim    { color: var(--text3); }
-.result   { color: var(--gold-light); font-weight: 700; }
-
-.card-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
-.card-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin: 20px 0; }
-.v2-card {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 20px;
-}
-.v2-card-title {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  color: var(--text3);
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-.v2-card-value { font-size: 22px; font-weight: 500; color: var(--text); }
-.v2-card-sub   { font-size: 12px; color: var(--text3); margin-top: 4px; }
-
-.pill {
-  display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.05em;
+  gap: 10px;
 }
-.pill::before {
+.sec-head::after {
   content: '';
-  width: 5px; height: 5px;
-  border-radius: 50%;
-  background: currentColor;
-}
-.pill-green { background: var(--green-bg);  color: var(--green);  border: 1px solid rgba(61,170,106,0.25); }
-.pill-red   { background: var(--red-bg);    color: #DD4444;        border: 1px solid rgba(221,68,68,0.25); }
-.pill-amber { background: var(--amber-bg);  color: var(--amber);  border: 1px solid rgba(224,154,42,0.25); }
-.pill-blue  { background: var(--blue-bg);   color: var(--blue);   border: 1px solid rgba(74,158,219,0.25); }
-.pill-grey  { background: rgba(100,100,100,0.1); color: var(--text3); border: 1px solid rgba(100,100,100,0.2); }
-
-.score-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
-.score-table th {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text3);
-  padding: 10px 16px;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-}
-.score-table td {
-  padding: 11px 16px;
-  font-size: 13px;
-  color: var(--text2);
-  border-bottom: 1px solid rgba(201,146,42,0.07);
-  vertical-align: middle;
-}
-.score-table tr:last-child td { border-bottom: none; }
-.pts {
-  font-family: var(--mono);
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--gold-light);
-  text-align: right;
-}
-.row-header td {
-  background: rgba(201,146,42,0.04);
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--text3);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  padding: 10px 16px 6px;
-}
-
-.compare-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
-.compare-table thead th {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  padding: 10px 16px;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-  color: var(--text3);
-}
-.compare-table td {
-  padding: 11px 16px;
-  border-bottom: 1px solid rgba(201,146,42,0.07);
-  color: var(--text2);
-  vertical-align: top;
-}
-.compare-table tr:last-child td { border-bottom: none; }
-.compare-table td:first-child { font-size: 13px; color: var(--text); font-weight: 500; }
-.td-old { color: var(--text3) !important; }
-.td-new { color: var(--green) !important; }
-
-.math-box {
-  background: var(--bg3);
-  border-left: 3px solid var(--gold);
-  border-radius: 0 10px 10px 0;
-  padding: 20px 24px;
-  margin: 20px 0;
-  font-family: var(--mono);
-  font-size: 13px;
-  line-height: 2;
-  color: var(--text2);
-  white-space: pre-wrap;
-}
-
-.warn-box {
-  background: var(--red-bg);
-  border: 1px solid rgba(221,68,68,0.2);
-  border-radius: 10px;
-  padding: 16px 20px;
-  margin: 20px 0;
-}
-.warn-title {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: #DD4444;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-.info-box {
-  background: var(--blue-bg);
-  border: 1px solid rgba(74,158,219,0.2);
-  border-radius: 10px;
-  padding: 16px 20px;
-  margin: 20px 0;
-}
-.info-title {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--blue);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-.box-p { color: var(--text2); font-size: 13px; margin: 0; line-height: 1.7; }
-
-.flow {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 28px;
-  margin: 20px 0;
-}
-.flow-step {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 24px;
-  position: relative;
-}
-.flow-step:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  left: 14px; top: 32px;
-  width: 1px;
-  height: calc(100% + 8px);
+  flex: 1;
+  height: 1px;
   background: var(--border);
 }
-.flow-num {
-  width: 30px; height: 30px;
-  border-radius: 50%;
-  border: 1px solid var(--border-strong);
-  background: var(--bg4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--gold);
-  flex-shrink: 0;
-  z-index: 1;
-}
-.flow-label { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
-.flow-desc  { font-size: 13px; color: var(--text2); margin: 0; line-height: 1.6; }
 
-.score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
-.score-display {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 20px;
-  background: var(--bg3);
+/* ── CHART CARD ── */
+.chart-card {
+  background: var(--bg2);
   border: 1px solid var(--border);
-  border-radius: 10px;
-}
-.score-circle {
-  width: 72px; height: 72px;
-  border-radius: 50%;
-  border: 2px solid var(--gold);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  background: var(--amber-bg);
-}
-.score-num { font-family: var(--mono); font-size: 24px; font-weight: 700; color: var(--gold-light); line-height: 1; }
-.score-max { font-family: var(--mono); font-size: 10px; color: var(--text3); }
-.score-lbl { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
-.score-dsc { font-size: 13px; color: var(--text2); line-height: 1.5; }
-
-.cheat {
-  background: var(--bg3);
-  border: 1px solid var(--border-strong);
   border-radius: 12px;
   overflow: hidden;
+  margin-bottom: 20px;
 }
-.cheat-header {
-  background: rgba(201,146,42,0.08);
-  border-bottom: 1px solid var(--border);
+.chart-card-header {
   padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.chart-card-title {
   font-family: var(--mono);
   font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text2);
+}
+
+/* ── CONFLUENCE CHECKLIST ── */
+.checklist {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.checklist-header {
+  background: rgba(201,146,42,0.06);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 18px;
+  font-family: var(--mono);
+  font-size: 10px;
   letter-spacing: 0.15em;
   color: var(--gold-light);
   text-transform: uppercase;
 }
-.cheat-body { padding: 8px 20px 16px; }
-.cheat-row {
+.check-item {
   display: flex;
-  align-items: baseline;
-  gap: 16px;
-  padding: 9px 0;
-  border-bottom: 1px solid rgba(201,146,42,0.07);
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 18px;
+  border-bottom: 1px solid rgba(201,146,42,0.05);
 }
-.cheat-row:last-child { border-bottom: none; }
-.cheat-step {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--gold);
-  font-weight: 700;
-  min-width: 60px;
+.check-item:last-child { border-bottom: none; }
+.check-icon {
+  font-size: 14px;
+  margin-top: 1px;
   flex-shrink: 0;
-}
-.cheat-text { font-size: 13px; color: var(--text2); line-height: 1.5; }
-.cheat-text strong { color: var(--text); font-weight: 500; }
-
-.weekly-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-  margin: 16px 0;
-}
-.week-day {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 8px;
+  width: 20px;
   text-align: center;
 }
-.week-day.active { border-color: var(--gold); background: var(--amber-bg); }
-.week-day-name {
+.check-body { flex: 1; }
+.check-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.check-name.pass { color: var(--green); }
+.check-name.fail { color: var(--text3); }
+.check-name.warn { color: var(--amber); }
+.check-detail { font-size: 11px; color: var(--text3); line-height: 1.4; }
+.check-right {
   font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.1em;
-  color: var(--text3);
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-.week-day.active .week-day-name { color: var(--gold); }
-.week-day-items { font-size: 10px; color: var(--text2); line-height: 1.6; }
-.week-day.active .week-day-items { color: var(--gold-light); }
-
-code {
-  font-family: var(--mono);
-  font-size: 12px;
-  background: var(--bg4);
-  border: 1px solid var(--border);
-  padding: 1px 6px;
-  border-radius: 4px;
-  color: var(--gold-light);
-}
-
-.v2-hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
-
-.stTabs [data-baseweb="tab-list"] {
-  background: #141414 !important;
-  border-bottom: 1px solid rgba(201,146,42,0.18) !important;
-  padding: 0 60px !important;
-  gap: 0 !important;
-  overflow-x: auto;
-}
-.stTabs [data-baseweb="tab"] {
-  background: transparent !important;
-  color: #6A6660 !important;
-  border-bottom: 2px solid transparent !important;
-  border-radius: 0 !important;
-  padding: 14px 16px !important;
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 11px !important;
-  letter-spacing: 0.08em !important;
-  text-transform: uppercase !important;
+  font-size: 11px;
+  font-weight: 700;
   white-space: nowrap;
+  padding: 2px 8px;
+  border-radius: 4px;
 }
-.stTabs [aria-selected="true"] {
-  color: #F0C060 !important;
-  border-bottom-color: #C9922A !important;
+.check-right.pass { color: var(--green); background: var(--green-dim); }
+.check-right.fail { color: var(--red);   background: var(--red-dim);   }
+.check-right.warn { color: var(--amber); background: var(--amber-dim); }
+.check-right.info { color: var(--blue);  background: var(--blue-dim);  }
+
+/* ── TRADE LEVELS ── */
+.trade-panel {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
 }
-.stTabs [data-baseweb="tab-highlight"] { display: none; }
-div[data-testid="stTabsContent"] {
-  background: #0D0D0D !important;
-  padding: 0 !important;
+.trade-panel-header {
+  background: rgba(201,146,42,0.06);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 18px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--gold-light);
+  text-transform: uppercase;
+}
+.trade-level-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 18px;
+  border-bottom: 1px solid rgba(201,146,42,0.05);
+}
+.trade-level-row:last-child { border-bottom: none; }
+.tl-left { display: flex; align-items: center; gap: 10px; }
+.tl-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.tl-name { font-size: 13px; color: var(--text2); }
+.tl-desc { font-size: 11px; color: var(--text3); }
+.tl-price {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
 }
 
-@media (max-width: 700px) {
-  .v2-main { padding: 24px 20px 60px; }
-  .v2-header { padding: 32px 20px 28px; }
-  .card-grid-2, .card-grid-3 { grid-template-columns: 1fr; }
-  .score-grid { grid-template-columns: 1fr; }
-  .weekly-grid { grid-template-columns: repeat(4, 1fr); }
-  .v2-header h1 { font-size: 26px; }
-  .stTabs [data-baseweb="tab-list"] { padding: 0 16px !important; }
+/* ── COT HISTORY ── */
+.cot-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 18px;
+  border-bottom: 1px solid rgba(201,146,42,0.05);
+}
+.cot-row:last-child { border-bottom: none; }
+.cot-date { font-family: var(--mono); font-size: 11px; color: var(--text3); width: 90px; flex-shrink: 0; }
+.cot-bar-wrap { flex: 1; height: 6px; background: var(--bg4); border-radius: 3px; overflow: hidden; }
+.cot-bar-fill { height: 100%; border-radius: 3px; }
+.cot-val { font-family: var(--mono); font-size: 11px; font-weight: 700; width: 80px; text-align: right; flex-shrink: 0; }
+
+/* ── ALERTS PANEL ── */
+.alert-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 18px;
+  border-bottom: 1px solid rgba(201,146,42,0.05);
+}
+.alert-item:last-child { border-bottom: none; }
+.alert-time { font-family: var(--mono); font-size: 10px; color: var(--text3); width: 70px; flex-shrink: 0; padding-top: 2px; }
+.alert-msg { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+/* ── KILL ZONE INDICATOR ── */
+.kz-on {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--green-dim);
+  border: 1px solid var(--green-border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--green);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+.kz-off {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(74,90,106,0.15);
+  border: 1px solid rgba(74,90,106,0.2);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.05em;
+}
+
+/* ── INFO BOX ── */
+.info-strip {
+  background: var(--blue-dim);
+  border: 1px solid rgba(74,158,219,0.2);
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 12px;
+  color: var(--text2);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+/* ── FOOTER ── */
+.footer {
+  text-align: center;
+  padding: 24px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  border-top: 1px solid var(--border);
+  margin-top: 40px;
+  letter-spacing: 0.05em;
+}
+
+/* ── STREAMLIT OVERRIDES ── */
+div[data-testid="stButton"] button {
+  background: var(--bg3) !important;
+  color: var(--text2) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 6px !important;
+  font-family: var(--mono) !important;
+  font-size: 11px !important;
+  padding: 6px 16px !important;
+  letter-spacing: 0.05em !important;
+}
+div[data-testid="stButton"] button:hover {
+  border-color: var(--gold) !important;
+  color: var(--gold-light) !important;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .page { padding: 16px 16px 60px; }
+  .metric-row { grid-template-columns: repeat(3, 1fr); }
+  .metric-row-4 { grid-template-columns: repeat(2, 1fr); }
+  .topbar { padding: 12px 16px; }
+  .hero-left { gap: 12px; }
+  .hero-direction { font-size: 24px; }
+}
+@media (max-width: 600px) {
+  .metric-row { grid-template-columns: repeat(2, 1fr); }
+  .hero-icon { font-size: 28px; }
+  .hero-direction { font-size: 20px; }
 }
 </style>
 """, unsafe_allow_html=True)
 
 
-# ── HEADER ───────────────────────────────────────────────────
-st.markdown("""
-<div class="v2-header">
-  <div class="header-tag">Quantitative Trading Framework</div>
-  <h1>Gold Institutional Edge<br><span>Version 2.0</span></h1>
-  <p class="header-sub">
-    A fully rebuilt institutional-grade Gold trading system.
-    Every component upgraded, every arbitrary parameter replaced
-    with data-driven logic, every missing filter added.
-  </p>
-  <span class="version-badge">V2.0 — 10 System Upgrades Applied</span>
-</div>
-""", unsafe_allow_html=True)
+# ══════════════════════════════════════════════════════════════
+# DATA FUNCTIONS
+# ══════════════════════════════════════════════════════════════
+
+@st.cache_data(ttl=60)
+def fetch_gold():
+    try:
+        tk   = yf.Ticker("GC=F")
+        hist = tk.history(period="2d", interval="5m")
+        if hist.empty:
+            return None
+        price    = round(float(hist["Close"].iloc[-1]), 2)
+        prev     = round(float(hist["Close"].iloc[0]),  2)
+        chg      = round(price - prev, 2)
+        chg_pct  = round((chg / prev) * 100, 2)
+        high_day = round(float(hist["High"].iloc[-288:].max()), 2)
+        low_day  = round(float(hist["Low"].iloc[-288:].min()),  2)
+
+        # VWAP
+        today = hist[hist.index.date == hist.index[-1].date()]
+        if not today.empty:
+            today = today.copy()
+            today["TP"]   = (today["High"] + today["Low"] + today["Close"]) / 3
+            today["TPxV"] = today["TP"] * today["Volume"]
+            vwap = round(
+                float(today["TPxV"].cumsum().iloc[-1]
+                      / today["Volume"].cumsum().iloc[-1]), 2
+            )
+        else:
+            vwap = None
+
+        return {
+            "price": price, "prev": prev,
+            "chg": chg, "chg_pct": chg_pct,
+            "high": high_day, "low": low_day,
+            "vwap": vwap,
+            "above_vwap": price > vwap if vwap else None,
+            "hist": hist,
+        }
+    except Exception:
+        return None
 
 
-# ── TABS ─────────────────────────────────────────────────────
-tabs = st.tabs([
-    "Overview",
-    "Pillar 1 · IPI",
-    "Pillar 2 · Macro",
-    "Pillar 3 · Options",
-    "Pillar 4 · Structure",
-    "Entry System",
-    "Stops & Sizing",
-    "Scoring",
-    "Routine",
-    "Cheat Sheet",
-])
+@st.cache_data(ttl=300)
+def fetch_options():
+    try:
+        gld  = yf.Ticker("GLD")
+        xau  = yf.Ticker("GC=F")
+        gp   = float(gld.history(period="1d")["Close"].iloc[-1])
+        xp   = float(xau.history(period="1d")["Close"].iloc[-1])
+        mult = xp / gp
+        exp  = gld.options[0]
+        ch   = gld.option_chain(exp)
+        calls = ch.calls[ch.calls["openInterest"] > 10].copy()
+        puts  = ch.puts[ch.puts["openInterest"]  > 10].copy()
+        if calls.empty or puts.empty:
+            return None
+        pw  = float(puts.loc[puts["openInterest"].idxmax(),  "strike"])
+        cw  = float(calls.loc[calls["openInterest"].idxmax(),"strike"])
 
-def wrap(html):
-    st.markdown(f'<div class="v2-main">{html}</div>', unsafe_allow_html=True)
+        # max pain
+        strikes = sorted(set(calls["strike"].tolist() + puts["strike"].tolist()))
+        pain = {}
+        for s in strikes:
+            pain[s] = (calls[calls["strike"] > s]["openInterest"].sum()
+                     + puts[puts["strike"]  < s]["openInterest"].sum())
+        mp = float(min(pain, key=pain.get))
+
+        pc = round(puts["openInterest"].sum() / calls["openInterest"].sum(), 2)
+        return {
+            "put_wall":  round(pw  * mult, 2),
+            "call_wall": round(cw  * mult, 2),
+            "max_pain":  round(mp  * mult, 2),
+            "pc_ratio":  pc,
+            "expiry":    exp,
+            "mult":      round(mult, 2),
+            "error":     None,
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@st.cache_data(ttl=3600)
+def fetch_cot():
+    try:
+        url = (
+            "https://publicreporting.cftc.gov/resource/jun7-fc8e.json"
+            "?cftc_contract_market_code=088691"
+            "&$order=report_date_as_yyyy_mm_dd DESC&$limit=12"
+        )
+        rows = requests.get(url, timeout=15).json()
+        if len(rows) < 2:
+            return None
+        results = []
+        for r in rows:
+            ml = int(r.get("m_money_positions_long_all",  0))
+            ms = int(r.get("m_money_positions_short_all", 0))
+            results.append({
+                "date":    r.get("report_date_as_yyyy_mm_dd","")[:10],
+                "mm_long": ml, "mm_short": ms,
+                "mm_net":  ml - ms,
+            })
+        nets = [r["mm_net"] for r in results]
+        hi   = max(nets)
+        lo   = min(nets)
+        ipi  = round((nets[0] - lo) / (hi - lo) * 100, 1) if hi != lo else 50
+        chg  = nets[0] - nets[1]
+        acc  = (chg > 0 and nets[1] - nets[2] > 0) or (chg < 0 and nets[1] - nets[2] < 0)
+        if   ipi > 75: bias = "STRONG BULLISH"
+        elif ipi > 55: bias = "MILD BULLISH"
+        elif ipi < 25: bias = "STRONG BEARISH"
+        elif ipi < 45: bias = "MILD BEARISH"
+        else:          bias = "NEUTRAL"
+        return {
+            "ipi": ipi, "bias": bias, "change": chg,
+            "accelerating": acc,
+            "mm_net":   nets[0],
+            "mm_long":  results[0]["mm_long"],
+            "mm_short": results[0]["mm_short"],
+            "date":     results[0]["date"],
+            "history":  results[:8],
+        }
+    except Exception:
+        return None
+
+
+@st.cache_data(ttl=300)
+def fetch_dxy():
+    try:
+        d = yf.Ticker("DX-Y.NYB").history(period="6mo", interval="1wk")
+        if d.empty:
+            return None
+        price   = round(float(d["Close"].iloc[-1]), 2)
+        ema20   = round(float(d["Close"].ewm(span=20).mean().iloc[-1]), 2)
+        above   = price > ema20
+        trend   = "RISING" if d["Close"].iloc[-1] > d["Close"].iloc[-2] else "FALLING"
+        return {"price": price, "ema20": ema20,
+                "above_ema": above, "trend": trend}
+    except Exception:
+        return None
+
+
+@st.cache_data(ttl=300)
+def fetch_vix():
+    try:
+        d = yf.Ticker("^VIX").history(period="2d")
+        if d.empty:
+            return None
+        v = round(float(d["Close"].iloc[-1]), 2)
+        if   v > 40: regime = "CRISIS"
+        elif v > 30: regime = "HIGH"
+        elif v > 20: regime = "ELEVATED"
+        else:        regime = "NORMAL"
+        return {"value": v, "regime": regime}
+    except Exception:
+        return None
+
+
+def is_kill_zone():
+    h = datetime.now(pytz.utc).hour
+    return (7 <= h < 10) or (12 <= h < 15)
+
+
+def is_market_open():
+    now = datetime.now(pytz.utc)
+    return now.weekday() < 5 and (1 <= now.hour < 22)
+
+
+def score_setup(gold, opts, cot, dxy, vix):
+    """Returns score out of 14 and a breakdown list."""
+    s = 0
+    items = []
+
+    # IPI (max 2)
+    if cot:
+        ipi = cot["ipi"]
+        if ipi > 75 or ipi < 25:
+            s += 2
+            items.append(("IPI Extreme", "pass", f"IPI = {ipi}", "+2"))
+        elif ipi > 55 or ipi < 45:
+            s += 1
+            items.append(("IPI Directional", "pass", f"IPI = {ipi}", "+1"))
+        else:
+            items.append(("IPI Neutral Zone", "fail", f"IPI = {ipi} — no trade week", "0"))
+
+        # Momentum (max 1)
+        if cot["accelerating"]:
+            s += 1
+            items.append(("COT Momentum Accelerating", "pass",
+                           "2 consecutive weeks same direction", "+1"))
+        else:
+            items.append(("COT Momentum", "fail", "Not accelerating", "0"))
+    else:
+        items.append(("COT / IPI", "warn", "Data unavailable", "?"))
+
+    # Real Yields — not fetched live (manual check note)
+    items.append(("Real Yields", "info",
+                   "Check FRED manually each Monday (DFII10)", "?"))
+
+    # DXY (max 1)
+    if dxy:
+        if not dxy["above_ema"] and dxy["trend"] == "FALLING":
+            s += 1
+            items.append(("DXY Alignment", "pass",
+                           f"DXY {dxy['price']} below 20W EMA {dxy['ema20']} and falling", "+1"))
+        elif dxy["above_ema"] and dxy["trend"] == "RISING":
+            items.append(("DXY Headwind", "fail",
+                           f"DXY {dxy['price']} above 20W EMA {dxy['ema20']} and rising", "−1"))
+        else:
+            items.append(("DXY Neutral", "warn",
+                           f"DXY {dxy['price']} vs EMA {dxy['ema20']} — mixed", "0"))
+    else:
+        items.append(("DXY", "warn", "Unavailable", "?"))
+
+    # VIX (not scored but shown)
+    if vix:
+        if vix["regime"] == "NORMAL":
+            items.append(("VIX Regime", "pass",
+                           f"VIX {vix['value']} — normal environment", "✓"))
+        elif vix["regime"] == "CRISIS":
+            items.append(("VIX Crisis", "fail",
+                           f"VIX {vix['value']} — PAUSE ALL TRADING", "✗"))
+        else:
+            items.append(("VIX Elevated", "warn",
+                           f"VIX {vix['value']} — reduce size 25%", "!"))
+
+    # Options (max 2)
+    if opts and not opts.get("error"):
+        if gold:
+            pw_dist  = abs(gold["price"] - opts["put_wall"])
+            cw_dist  = abs(gold["price"] - opts["call_wall"])
+            near_pct = min(pw_dist, cw_dist) / gold["price"] * 100
+            if near_pct <= 0.5:
+                s += 1
+                items.append(("Wall Proximity", "pass",
+                               f"Price within 0.5% of key wall", "+1"))
+            else:
+                items.append(("Wall Proximity", "fail",
+                               f"Price {round(min(pw_dist,cw_dist),1)} from nearest wall", "0"))
+        items.append(("Wall OI", "info",
+                       "Check OI decay manually each morning", "?"))
+        if opts["pc_ratio"] > 1.3:
+            s += 1
+            items.append(("P/C Ratio Bullish", "pass",
+                           f"P/C = {opts['pc_ratio']} — institutions hedging longs", "+1"))
+        else:
+            items.append(("P/C Ratio", "warn",
+                           f"P/C = {opts['pc_ratio']}", "0"))
+    else:
+        items.append(("Options Data", "warn", "Markets closed or data error", "?"))
+
+    # Structure (manual — shown as reminders)
+    items.append(("Weekly Structure", "info",
+                   "Check 200W EMA on TradingView each Monday", "?"))
+    items.append(("4H Structure", "info",
+                   "Check higher highs/lows on 4H chart", "?"))
+
+    # VWAP (max 1)
+    if gold and gold["vwap"]:
+        ab = gold["above_vwap"]
+        disp = abs(gold["price"] - gold["vwap"])
+        if disp >= 5:
+            s += 1
+            items.append(("VWAP Displacement", "pass",
+                           f"${disp:.1f} displacement — meaningful sweep", "+1"))
+        else:
+            items.append(("VWAP Displacement", "fail",
+                           f"Only ${disp:.1f} from VWAP — not enough", "0"))
+
+    # Kill zone (max 1)
+    if is_kill_zone():
+        s += 1
+        items.append(("Kill Zone Active", "pass",
+                       "London or New York session active", "+1"))
+    else:
+        h = datetime.now(pytz.utc).hour
+        items.append(("Kill Zone", "fail",
+                       f"UTC {h:02d}:xx — outside London/NY window", "0"))
+
+    return min(s, 14), items
+
+
+def build_chart(gold, opts):
+    if not gold or gold.get("hist") is None:
+        return None
+    try:
+        hist = gold["hist"].copy()
+        hist = hist[hist.index.date == hist.index[-1].date()]
+        hist = hist.tail(100)
+
+        if hist.empty:
+            return None
+
+        # VWAP
+        hist["TP"]   = (hist["High"] + hist["Low"] + hist["Close"]) / 3
+        hist["TPxV"] = hist["TP"] * hist["Volume"]
+        hist["VWAP"] = hist["TPxV"].cumsum() / hist["Volume"].cumsum()
+
+        fig = go.Figure()
+
+        # Candles
+        fig.add_trace(go.Candlestick(
+            x=hist.index,
+            open=hist["Open"], high=hist["High"],
+            low=hist["Low"],   close=hist["Close"],
+            name="XAUUSD",
+            increasing_fillcolor="#00D395",
+            increasing_line_color="#00D395",
+            decreasing_fillcolor="#FF4D6A",
+            decreasing_line_color="#FF4D6A",
+            line_width=1,
+        ))
+
+        # VWAP
+        fig.add_trace(go.Scatter(
+            x=hist.index, y=hist["VWAP"],
+            name="VWAP",
+            line=dict(color="#4A9EDB", width=1.5, dash="dot"),
+            mode="lines",
+        ))
+
+        # Walls
+        if opts and not opts.get("error"):
+            for lvl, clr, nm in [
+                (opts["put_wall"],  "#00D395", f"Put Wall ${opts['put_wall']:,.0f}"),
+                (opts["call_wall"], "#FF4D6A", f"Call Wall ${opts['call_wall']:,.0f}"),
+                (opts["max_pain"],  "#F0C060", f"Max Pain ${opts['max_pain']:,.0f}"),
+            ]:
+                fig.add_hline(
+                    y=lvl, line_color=clr,
+                    line_width=1.2, line_dash="dash",
+                    annotation_text=f"  {nm}",
+                    annotation_position="left",
+                    annotation_font_color=clr,
+                    annotation_font_size=10,
+                )
+
+        fig.update_layout(
+            paper_bgcolor="#0D1117",
+            plot_bgcolor="#0D1117",
+            font=dict(color="#8A9BB0", family="DM Sans"),
+            xaxis=dict(
+                showgrid=True, gridcolor="#131920",
+                rangeslider=dict(visible=False),
+                color="#4A5A6A",
+            ),
+            yaxis=dict(
+                showgrid=True, gridcolor="#131920",
+                color="#4A5A6A", side="right",
+                tickformat=",.0f",
+            ),
+            legend=dict(
+                bgcolor="#0D1117", bordercolor="#131920",
+                borderwidth=1, font=dict(size=10),
+                orientation="h",
+                yanchor="bottom", y=1.02,
+                xanchor="left", x=0,
+            ),
+            margin=dict(l=10, r=80, t=10, b=20),
+            height=400,
+            hovermode="x unified",
+        )
+        fig.update_traces(selector=dict(type="candlestick"), xaxis="x")
+        return fig
+    except Exception:
+        return None
+
+
+def build_cot_chart(cot):
+    if not cot:
+        return None
+    try:
+        df = pd.DataFrame(cot["history"]).sort_values("date")
+        colors = ["#00D395" if v > 0 else "#FF4D6A" for v in df["mm_net"]]
+        fig = go.Figure()
+        fig.add_trace(go.Bar(
+            x=df["date"], y=df["mm_net"],
+            marker_color=colors,
+            name="MM Net",
+            hovertemplate="<b>%{x}</b><br>Net: %{y:,}<extra></extra>",
+        ))
+        fig.add_hline(y=0, line_color="#4A5A6A", line_width=1)
+        fig.update_layout(
+            paper_bgcolor="#0D1117",
+            plot_bgcolor="#0D1117",
+            font=dict(color="#8A9BB0"),
+            xaxis=dict(showgrid=False, color="#4A5A6A", tickangle=-30),
+            yaxis=dict(showgrid=True, gridcolor="#131920",
+                       color="#4A5A6A", tickformat=","),
+            height=220,
+            margin=dict(l=10, r=10, t=10, b=40),
+            showlegend=False,
+        )
+        return fig
+    except Exception:
+        return None
 
 
 # ══════════════════════════════════════════════════════════════
-# TAB 0 — OVERVIEW
+# MAIN APP
 # ══════════════════════════════════════════════════════════════
-with tabs[0]:
-    wrap("""
-<span class="section-label">Upgrade Summary</span>
-<div class="v2-h2">What changed from V1 — and why</div>
-<p class="v2-p">
-  V1 had a sound conceptual framework with four critical flaws:
-  an arbitrary COT threshold, no macro context, static stop distances,
-  and zero setup scoring. V2 fixes all four and adds six additional
-  layers that institutional desks actually use.
-</p>
-
-<table class="compare-table">
-<thead>
-  <tr><th>Component</th><th>V1 — Original</th><th>V2 — Upgraded</th></tr>
-</thead>
-<tbody>
-  <tr><td>COT Signal</td>
-    <td class="td-old">Raw weekly change ±5,000 contracts</td>
-    <td class="td-new">Normalized IPI Index (52-wk range) + momentum confirmation</td></tr>
-  <tr><td>Macro Filter</td>
-    <td class="td-old">Not present</td>
-    <td class="td-new">Real yields, DXY, Gold/Silver ratio, VIX regime</td></tr>
-  <tr><td>Options Walls</td>
-    <td class="td-old">Raw OI snapshot, static</td>
-    <td class="td-new">OI decay-adjusted, gamma-weighted, skew-informed</td></tr>
-  <tr><td>Market Structure</td>
-    <td class="td-old">Not present</td>
-    <td class="td-new">4-pillar MTF framework (weekly → 4H → 15min → 5min)</td></tr>
-  <tr><td>VWAP Entry</td>
-    <td class="td-old">Any VWAP reclaim counts</td>
-    <td class="td-new">Min $5 displacement + candlestick confirmation + volume</td></tr>
-  <tr><td>Stop Placement</td>
-    <td class="td-old">$8 fixed buffer</td>
-    <td class="td-new">1.5× Daily ATR or structural swing low, whichever wider</td></tr>
-  <tr><td>Position Sizing</td>
-    <td class="td-old">1% flat risk per trade</td>
-    <td class="td-new">Volatility-adjusted with 25% Kelly overlay + account heat limit</td></tr>
-  <tr><td>News Filter</td>
-    <td class="td-old">Manual footnote</td>
-    <td class="td-new">Hard exclusion zones: FOMC, NFP, CPI, PPI, PCE ±60 min</td></tr>
-  <tr><td>Seasonality</td>
-    <td class="td-old">Not present</td>
-    <td class="td-new">Monthly bias filter with historical Gold tendency data</td></tr>
-  <tr><td>Setup Scoring</td>
-    <td class="td-old">Not present</td>
-    <td class="td-new">0–14 score system — only trade 7+, size up at 9–10</td></tr>
-</tbody>
-</table>
-
-<div class="v2-hr"></div>
-<div class="v2-h3">The Four Pillars at a Glance</div>
-<div class="card-grid-2">
-  <div class="v2-card">
-    <div class="v2-card-title">Pillar 1 — IPI</div>
-    <div class="v2-card-value" style="color:#F0C060;font-size:16px">Institutional Positioning</div>
-    <div class="v2-card-sub" style="margin-top:8px;font-size:13px;color:#A8A49A;line-height:1.6">
-      52-week normalized COT index.<br>
-      Answers: <em>which direction is smart money pointed this week?</em>
-    </div>
-  </div>
-  <div class="v2-card">
-    <div class="v2-card-title">Pillar 2 — Macro</div>
-    <div class="v2-card-value" style="color:#4A9EDB;font-size:16px">Context Filter</div>
-    <div class="v2-card-sub" style="margin-top:8px;font-size:13px;color:#A8A49A;line-height:1.6">
-      Real yields, DXY, VIX, seasonality.<br>
-      Answers: <em>is the macro tailwind aligned?</em>
-    </div>
-  </div>
-  <div class="v2-card">
-    <div class="v2-card-title">Pillar 3 — Options</div>
-    <div class="v2-card-value" style="color:#3DAA6A;font-size:16px">Price Level Intelligence</div>
-    <div class="v2-card-sub" style="margin-top:8px;font-size:13px;color:#A8A49A;line-height:1.6">
-      Put Wall, Call Wall, Max Pain, IV skew.<br>
-      Answers: <em>where will price react this week?</em>
-    </div>
-  </div>
-  <div class="v2-card">
-    <div class="v2-card-title">Pillar 4 — Structure</div>
-    <div class="v2-card-value" style="color:#9B6FD4;font-size:16px">Multi-Timeframe Context</div>
-    <div class="v2-card-sub" style="margin-top:8px;font-size:13px;color:#A8A49A;line-height:1.6">
-      Weekly → Daily → 4H → 5min alignment.<br>
-      Answers: <em>is this candle in the right direction?</em>
-    </div>
-  </div>
-</div>
-""")
-
-
-# ══════════════════════════════════════════════════════════════
-# TAB 1 — IPI
-# ══════════════════════════════════════════════════════════════
-with tabs[1]:
-    wrap("""
-<span class="section-label">Pillar 1 — Upgraded</span>
-<div class="v2-h2">Institutional Positioning Index (IPI)</div>
-
-<div class="upgrade-banner">
-  <div class="upgrade-icon">▲</div>
-  <div>
-    <div class="upgrade-title">V1 Flaw Corrected</div>
-    <p class="upgrade-text">
-      V1 used raw weekly contract change (±5,000 threshold). This is arbitrary
-      and context-blind. A 5,000 contract swing means something completely
-      different when total net positioning is at 50,000 vs 250,000. V2
-      normalizes against the 52-week range to give a true extreme reading.
-    </p>
-  </div>
-</div>
-
-<div class="v2-h3">The IPI Formula</div>
-<div class="math-box"><span class="c-dim">// Step 1: Calculate current Managed Money net position</span>
-MM_Net_Now  = MM_Longs_This_Week  − MM_Shorts_This_Week
-MM_Net_Prev = MM_Longs_Last_Week  − MM_Shorts_Last_Week
-
-<span class="c-dim">// Step 2: Get 52-week high and low of MM_Net</span>
-MM_Net_52w_High = max(MM_Net over past 52 weeks)
-MM_Net_52w_Low  = min(MM_Net over past 52 weeks)
-
-<span class="c-dim">// Step 3: Calculate the IPI (0–100 scale)</span>
-<span class="result">IPI = (MM_Net_Now − MM_Net_52w_Low) / (MM_Net_52w_High − MM_Net_52w_Low) × 100</span>
-
-<span class="c-dim">// Step 4: Add momentum confirmation</span>
-Momentum      = MM_Net_Now  − MM_Net_Prev
-Momentum_Prev = MM_Net_Prev − MM_Net_2wks_ago
-<span class="result">Accelerating  = same sign AND abs(Momentum) > abs(Momentum_Prev)</span></div>
-
-<div class="v2-h3">IPI Signal Thresholds</div>
-<div class="code-block"><span class="c-green">IPI > 75  →  STRONG BULLISH</span>
-  Near 52-week extreme long positioning.
-  Only look for BUY setups. Strong institutional conviction.
-  <span class="c-green">+ Accelerating momentum = +2 bonus points on Scoring System</span>
-
-<span class="c-gold">IPI 55–75  →  MILD BULLISH</span>
-  Moderate long bias. Valid for trades but lower conviction.
-  Require higher confluence score (8+ instead of 7+).
-
-<span class="c-amber">IPI 45–55  →  NEUTRAL ZONE</span>
-  No clear directional edge from positioning.
-  <span class="c-amber">SKIP THE WEEK. No new positions.</span>
-
-<span class="c-gold">IPI 25–45  →  MILD BEARISH</span>
-  Moderate short bias. Only look for SELL setups.
-  Require higher confluence score (8+ instead of 7+).
-
-<span class="c-red">IPI < 25  →  STRONG BEARISH</span>
-  Near 52-week extreme short positioning.
-  Only look for SELL setups. Strong institutional conviction.
-  <span class="c-red">+ Accelerating momentum = +2 bonus points on Scoring System</span></div>
-
-<div class="v2-h3">Adding Commercial Hedger Confirmation</div>
-<p class="v2-p">
-  Commercials in Gold are miners, producers, and jewelry manufacturers who
-  are structurally net short. Their extreme positioning is a contrarian
-  signal — when they are at historical extremes it often marks turning points.
-</p>
-<div class="code-block"><span class="c-dim">// Commercial Net Position (always negative in Gold)</span>
-Comm_Net = Comm_Longs − Comm_Shorts
-Comm_IPI = (Comm_Net − Comm_52w_Low) / (Comm_52w_High − Comm_52w_Low) × 100
-
-<span class="c-green">Comm_IPI > 70  →  Producers NOT hedging aggressively = expect price to RISE</span>
-   CONFIRMS bullish MM bias.
-
-<span class="c-red">Comm_IPI < 30  →  Producers aggressively hedging = expect price to FALL</span>
-   CONFIRMS bearish MM bias.
-
-IPI Strong Bullish + Comm_IPI > 70 = <span class="c-green">MAX LONG CONVICTION  (+1 bonus point)</span>
-IPI Strong Bearish + Comm_IPI < 30 = <span class="c-red">MAX SHORT CONVICTION (+1 bonus point)</span></div>
-
-<div class="info-box">
-  <div class="info-title">Data Source</div>
-  <p class="box-p">
-    CFTC Disaggregated COT Report — Gold Futures (/GC).
-    Available free at cftc.gov every Friday ~15:30 EST.
-    The 52-week high/low tracking needs to be done in a spreadsheet
-    or automated via the CFTC public API.
-    Minimum 12 weeks of data needed before the IPI is reliable.
-  </p>
-</div>
-""")
-
-
-# ══════════════════════════════════════════════════════════════
-# TAB 2 — MACRO
-# ══════════════════════════════════════════════════════════════
-with tabs[2]:
-    wrap("""
-<span class="section-label">Pillar 2 — New Addition</span>
-<div class="v2-h2">Macro Context Filter</div>
-
-<div class="upgrade-banner">
-  <div class="upgrade-icon">+</div>
-  <div>
-    <div class="upgrade-title">New in V2</div>
-    <p class="upgrade-text">
-      V1 had zero macro context. Trading Gold without knowing the direction of
-      real yields and the Dollar is like sailing without checking wind direction.
-      These filters take 5 minutes to check on Monday morning and eliminate an
-      entire category of losing trades.
-    </p>
-  </div>
-</div>
-
-<div class="v2-h3">Filter 1 — Real Yields (Most Important Macro Input)</div>
-<p class="v2-p">
-  Gold is priced against real yields (nominal yield minus inflation expectation).
-  Rising real yields increase the opportunity cost of holding Gold. Falling real
-  yields are the single most powerful tailwind for Gold. This relationship is
-  robust over decades.
-</p>
-<div class="code-block"><span class="c-dim">// US 10-Year TIPS Yield — Source: fred.stlouisfed.org/series/DFII10 (free, daily)</span>
-
-<span class="c-green">Real Yields FALLING week-over-week  →  GOLD TAILWIND</span>
-   Confirms bullish IPI bias. Adds +1 to scoring.
-
-<span class="c-amber">Real Yields FLAT (±0.05% change)  →  NEUTRAL</span>
-   No macro boost. Trade on other signals only.
-
-<span class="c-red">Real Yields RISING week-over-week  →  GOLD HEADWIND</span>
-   DOWNGRADE any bullish IPI reading by one tier.
-   Strong Bullish IPI + Rising Real Yields = trade only on 9+.
-   Bearish IPI confirmed. Adds +1 to short setups.</div>
-
-<div class="v2-h3">Filter 2 — US Dollar Index (DXY)</div>
-<p class="v2-p">
-  Gold and the Dollar are inversely correlated roughly 75–80% of the time.
-  Aligning with DXY direction adds a powerful macro tailwind.
-</p>
-<div class="code-block"><span class="c-dim">// Check DXY weekly direction — above or below 20-week EMA?</span>
-
-<span class="c-green">DXY below 20W EMA and pointing DOWN  →  Dollar weakening</span>
-   Adds +1 to Gold long setups.
-
-<span class="c-amber">DXY flat / choppy  →  No contribution to scoring</span>
-
-<span class="c-red">DXY above 20W EMA and pointing UP  →  Dollar strengthening</span>
-   Subtracts 1 from Gold long setups. Adds +1 to short setups.
-
-<span class="c-dim">// BONUS: DXY COT Index</span>
-DXY MM IPI > 70 = additional Gold bearish headwind
-DXY MM IPI < 30 = additional Gold bullish tailwind</div>
-
-<div class="v2-h3">Filter 3 — VIX Regime</div>
-<div class="code-block"><span class="c-green">VIX < 20  →  Normal risk environment. Trade normally.</span>
-
-<span class="c-amber">VIX 20–30  →  Elevated. Widen stop to 2× ATR. Reduce size 25%.</span>
-
-<span class="c-red">VIX > 30  →  CRISIS MODE. Gold can gap violently.</span>
-   Options walls become unreliable. Only take 9+ setups.
-   Size down to 50% of normal. Stop must be 2.5× ATR.
-
-<span class="c-red">VIX > 40  →  PAUSE ALL TRADING until VIX falls below 30.</span>
-   No edge exists in this environment for this system.</div>
-
-<div class="v2-h3">Filter 4 — Seasonality</div>
-<div class="code-block"><span class="c-green">HIGH-BIAS MONTHS (historically bullish tendency):</span>
-  January    — Year-start institutional buying, India jewelry season
-  July–Aug   — Pre-monsoon Indian demand, summer fund positioning
-  September  — Diwali demand build-up, historically strong
-
-<span class="c-amber">NEUTRAL MONTHS:</span>
-  February, March, June, October, December
-
-<span class="c-red">WEAK-BIAS MONTHS (historically flat-to-bearish tendency):</span>
-  April      — Tax season liquidations, post-Chinese New Year lull
-  May–June   — Historically Gold's weakest stretch of the year
-  November   — Dollar often strengthens into year-end
-
-<span class="c-dim">// During weak months: require 8+ score for longs.
-// During strong months: 7 is sufficient.
-// Never block trades entirely based on seasonality alone.</span></div>
-
-<div class="warn-box">
-  <div class="warn-title">Macro Context Is a Filter, Not a Trading Signal</div>
-  <p class="box-p">
-    None of these macro inputs generate entries. They adjust the bar for taking
-    trades. A bearish macro backdrop means you need more confluence, not that
-    you can never trade long. The market can and does ignore macro headwinds
-    for weeks at a time.
-  </p>
-</div>
-""")
-
-
-# ══════════════════════════════════════════════════════════════
-# TAB 3 — OPTIONS
-# ══════════════════════════════════════════════════════════════
-with tabs[3]:
-    wrap("""
-<span class="section-label">Pillar 3 — Upgraded</span>
-<div class="v2-h2">Options Intelligence System</div>
-
-<div class="upgrade-banner">
-  <div class="upgrade-icon">▲</div>
-  <div>
-    <div class="upgrade-title">V1 Flaw Corrected</div>
-    <p class="upgrade-text">
-      V1 used a static OI snapshot with no time decay adjustment. A wall on
-      Monday with 500K contracts is not the same wall on Thursday with 120K
-      contracts remaining after rolling. V2 tracks OI velocity (building or
-      decaying) and weights walls by time to expiry.
-    </p>
-  </div>
-</div>
-
-<div class="v2-h3">OI Decay-Adjusted Wall Strength</div>
-<div class="code-block"><span class="c-dim">// Record OI at the Put Wall strike every morning.</span>
-Monday    OI at $240 Put:  580,000 contracts  ← Baseline
-Tuesday   OI at $240 Put:  560,000 contracts
-Wednesday OI:              535,000 contracts
-Thursday  OI:              290,000 contracts  ← ⚠️ Wall decaying fast
-
-<span class="c-green">OI STABLE or INCREASING   →  Wall is Strong. Full confidence.</span>
-<span class="c-amber">OI down 10–25% from Monday  →  Wall is Normal. Slight caution.</span>
-<span class="c-red">OI down >25% from Monday   →  Wall is Weak. Reduce position size 30%.</span>
-<span class="c-red">OI down >50% from Monday   →  Wall has failed. Do NOT use this level.</span>
-
-<span class="c-dim">// Thursday warning: Near-term options expire Friday.
-// By Thursday afternoon, near-term OI can drop 60–80%.
-// Switch to NEXT WEEK's expiry for wall levels by Thursday.</span></div>
-
-<div class="v2-h3">IV Skew — The Institutional Fear Gauge</div>
-<p class="v2-p">
-  Implied volatility skew (how much more expensive puts are vs calls) tells you
-  what institutions are actually paying to hedge. An extreme skew shift is often
-  a leading indicator before a wall is tested.
-</p>
-<div class="code-block"><span class="c-dim">// GLD 25-delta skew = IV of 25-delta puts minus IV of 25-delta calls
-// Available free on Barchart.com or Market Chameleon</span>
-
-Skew > +5%  →  Puts significantly more expensive than calls.
-   Institutions paying UP for downside protection.
-   Counterintuitively BULLISH — they are long and hedging.
-   <span class="c-green">Reinforces Put Wall strength — strong support expected.</span>
-
-Skew 2–5%   →  Normal slight put premium. No special signal.
-
-Skew < 2%   →  Calls approaching put IV. Complacency.
-   <span class="c-amber">Warning: Institutions not hedging = may not be as long.</span>
-   Reduces confidence in Put Wall as support.
-
-<span class="c-dim">// Skew SPIKE (sudden +3% or more in one day):</span>
-   Someone just bought urgent put protection.
-   <span class="c-amber">Check for news. Do not trade until spike is explained.</span></div>
-
-<div class="v2-h3">Strong vs Weak Wall — Quick Reference</div>
-<div class="code-block">STRONG WALL — all of these together:
-  ✓  Strike has highest raw OI
-  ✓  Strike is within 1–3% of current price (near the money)
-  ✓  OI at that strike is stable or growing this week
-  ✓  IV skew is elevated (puts expensive)
-  ✓  Daily ATR puts current price within range of wall this session
-
-WEAK WALL — any of these:
-  ✗  Highest OI strike is >5% away from current price (far OTM)
-  ✗  OI at strike has dropped >25% since Monday
-  ✗  Another strike has OI within 80% of the "wall" strike
-     (diffuse OI = no single magnet point)
-  ✗  Major news event within 24 hours</div>
-
-<div class="v2-h3">Max Pain — Honest Assessment</div>
-<div class="info-box">
-  <div class="info-title">Corrected Use Case</div>
-  <p class="box-p">
-    V1 presented Max Pain as an active price magnet driven by market maker
-    activity. The academic evidence for this is thin. The more honest
-    interpretation: Max Pain marks a zone of low gamma stress — neither calls
-    nor puts are badly in the money. Price drifts into this zone when there is
-    no directional catalyst. Use it as a <strong>TP2 in quiet mid-week sessions
-    only</strong>, not as a reliable target during strong trending weeks or on
-    news days.
-  </p>
-</div>
-""")
-
-
-# ══════════════════════════════════════════════════════════════
-# TAB 4 — STRUCTURE
-# ══════════════════════════════════════════════════════════════
-with tabs[4]:
-    wrap("""
-<span class="section-label">Pillar 4 — New Addition</span>
-<div class="v2-h2">Multi-Timeframe Structure Framework</div>
-
-<div class="upgrade-banner">
-  <div class="upgrade-icon">+</div>
-  <div>
-    <div class="upgrade-title">New in V2</div>
-    <p class="upgrade-text">
-      V1 had no market structure context whatsoever. Trading options walls
-      without knowing the higher timeframe trend is like knowing where the
-      speed bumps are but not what road you're on. The MTF framework takes
-      10 minutes to check and fundamentally changes which setups you take.
-    </p>
-  </div>
-</div>
-
-<div class="v2-h3">The Four-Timeframe Stack</div>
-<div class="flow">
-  <div class="flow-step">
-    <div class="flow-num">W</div>
-    <div>
-      <div class="flow-label">Weekly Chart — Trend Context (Check Monday, valid all week)</div>
-      <p class="flow-desc">
-        Is price above or below the 200-week EMA? Are weekly closes making
-        higher highs / higher lows (uptrend) or lower highs / lower lows
-        (downtrend)? This is your macro trend. Only take trades that align
-        with the weekly structure. A Put Wall bounce in a weekly downtrend
-        needs a 9+ score to trade.
-      </p>
-    </div>
-  </div>
-  <div class="flow-step">
-    <div class="flow-num">D</div>
-    <div>
-      <div class="flow-label">Daily Chart — Swing Structure (Check each morning)</div>
-      <p class="flow-desc">
-        Previous day high (PDH) and previous day low (PDL) are key levels.
-        Fair Value Gaps (FVGs — three-candle imbalances) act as magnets.
-        Is today's open above or below yesterday's close? Daily VWAP from
-        the prior session provides an additional reference for the first
-        30 minutes of London.
-      </p>
-    </div>
-  </div>
-  <div class="flow-step">
-    <div class="flow-num">4H</div>
-    <div>
-      <div class="flow-label">4-Hour Chart — Entry Bias (Check at session open)</div>
-      <p class="flow-desc">
-        The 4H chart shows the current swing structure. Only take longs when
-        the 4H structure is making higher highs and higher lows. Only take
-        shorts when it is making lower highs and lower lows. A Put Wall bounce
-        where the 4H structure is still in a downswing = skip or require 9+.
-      </p>
-    </div>
-  </div>
-  <div class="flow-step">
-    <div class="flow-num">5m</div>
-    <div>
-      <div class="flow-label">5-Minute Chart — Trigger Timeframe</div>
-      <p class="flow-desc">
-        This is where VWAP entries are executed. The 5-minute chart should
-        confirm: liquidity sweep below the Put Wall, VWAP reclaim with minimum
-        $5 displacement, volume spike on the reversal bar, and ideally a clear
-        engulfing candle or pin bar as the entry signal.
-      </p>
-    </div>
-  </div>
-</div>
-
-<div class="v2-h3">Structure Alignment Scoring</div>
-<div class="code-block"><span class="c-green">Weekly UP + Daily UP + 4H UP + Near Put Wall</span>
-→ <span class="c-green">Full alignment — highest probability long setup. Add +2 to score.</span>
-
-<span class="c-gold">Weekly UP + Daily UP + 4H DOWN (pullback in uptrend)</span>
-→ <span class="c-gold">Pullback into support — valid but not ideal. Add +1 to score.</span>
-
-<span class="c-amber">Weekly UP + Daily DOWN + 4H DOWN</span>
-→ <span class="c-amber">Counter-trend long attempt. Add +0. Requires 9+ score.</span>
-
-<span class="c-red">Weekly DOWN + looking for long at Put Wall</span>
-→ <span class="c-red">Structural headwind. Subtract 1. Requires 9+ score.</span></div>
-
-<div class="info-box">
-  <div class="info-title">Fair Value Gap (FVG) — the extra level V1 didn't know about</div>
-  <p class="box-p">
-    A Fair Value Gap is formed when three consecutive candles create an
-    imbalance — the third candle's low is above the first candle's high
-    (bullish FVG) or vice versa (bearish FVG). Price has a strong tendency
-    to return and fill these gaps. On the daily chart, an unfilled bullish FVG
-    sitting below the Put Wall is one of the most powerful entry confluences
-    in the system. Mark them every morning.
-  </p>
-</div>
-""")
-
-
-# ══════════════════════════════════════════════════════════════
-# TAB 5 — ENTRY SYSTEM
-# ══════════════════════════════════════════════════════════════
-with tabs[5]:
-    wrap("""
-<span class="section-label">Entry System — Upgraded</span>
-<div class="v2-h2">The Precision Entry Protocol</div>
-
-<div class="upgrade-banner">
-  <div class="upgrade-icon">▲</div>
-  <div>
-    <div class="upgrade-title">V1 Flaw Corrected</div>
-    <p class="upgrade-text">
-      V1's VWAP entry had no minimum displacement rule. A 2-tick dip below
-      VWAP counted the same as a $12 sweep. In practice, shallow VWAP
-      violations are noise that fire false entries constantly. V2 requires a
-      meaningful displacement plus candlestick confirmation plus volume
-      validation.
-    </p>
-  </div>
-</div>
-
-<div class="v2-h3">Long Setup — Complete Entry Checklist</div>
-<div class="code-block"><span class="c-gold">PRE-CONDITIONS (check before each session):</span>
-  ✓  IPI ≥ 55 (bullish zone)
-  ✓  Weekly structure: uptrend or at major support
-  ✓  Real Yields: flat or falling
-  ✓  DXY: below 20W EMA or flat
-  ✓  VIX: below 30 (if 20–30, reduce size 25%)
-  ✓  No high-impact news within 60 minutes (FOMC/NFP/CPI/PCE/PPI)
-  ✓  Seasonality: not in a strong bearish month unless score 8+
-
-<span class="c-gold">SETUP TRIGGER (requires ALL of the following):</span>
-  ✓  Price within $5.00 of Put Wall     → Alert: APPROACHING
-  ✓  Price touches Put Wall (≤$1.50)    → Alert: TOUCHED
-  ✓  Price dips BELOW VWAP by ≥ $5.00  (liquidity sweep)
-  ✓  Price closes BACK ABOVE VWAP on 5-minute candle
-
-<span class="c-gold">ENTRY CONFIRMATION (requires at least ONE of):</span>
-  ✓  Reversal candle is a bullish engulfing
-     (body closes above previous candle high)
-  ✓  Reversal candle is a hammer/pin bar
-     (lower wick ≥ 2× body size)
-  ✓  Volume on reversal candle ≥ 1.5× 20-bar average
-
-<span class="c-gold">KILL ZONE (still required):</span>
-  ✓  London:   07:00–10:00 UTC
-  ✓  New York: 12:00–15:00 UTC
-
-<span class="c-green">ALL PRE-CONDITIONS + TRIGGER + ONE CONFIRMATION = ENTER</span>
-  → LONG at market on next 5-minute candle open
-  → Set stop, TP1, TP2, TP3, TP4 immediately
-  → Walk away from screen until first alert fires</div>
-
-<div class="v2-h3">The Liquidity Sweep — Why It Matters</div>
-<div class="code-block"><span class="c-dim">// What is a liquidity sweep?</span>
-Large institutional traders need to FILL large orders.
-To buy millions in Gold they need willing sellers.
-The most willing sellers are retail traders with stops
-just below support.
-
-So institutions briefly push price below the Put Wall...
-→ Retail longs are stopped out (their stops executed as sells)
-→ Institutions absorb all that selling at a lower price
-→ Price snaps back above the wall
-
-<span class="c-green">The sweep below VWAP IS this process happening in real time.</span>
-
-V1 said: wait for any VWAP dip and reclaim.
-V2 says: the dip must be ≥$5 to be a real sweep, not noise.
-
-<span class="c-gold">Bonus signal: sweep takes out the previous session's low (PDL)</span>
-Price dips below PDL and immediately reverses with VWAP reclaim =
-institutions hunting stops and absorbing supply.
-Highest-probability long setup in the system.</div>
-
-<div class="warn-box">
-  <div class="warn-title">The One Rule That Will Save You Most</div>
-  <p class="box-p">
-    If price touches the Put Wall, sweeps below VWAP by $10+, but fails to
-    close back above VWAP within 3 candles (15 minutes) — the setup has
-    failed. The wall is being broken. Do not enter. Exit any existing longs.
-    A genuine institutional defense closes above VWAP quickly and does not
-    linger below it.
-  </p>
-</div>
-""")
-
-
-# ══════════════════════════════════════════════════════════════
-# TAB 6 — STOPS & SIZING
-# ══════════════════════════════════════════════════════════════
-with tabs[6]:
-    wrap("""
-<span class="section-label">Risk Management — Upgraded</span>
-<div class="v2-h2">ATR-Based Stops &amp; Volatility-Adjusted Sizing</div>
-
-<div class="upgrade-banner">
-  <div class="upgrade-icon">▲</div>
-  <div>
-    <div class="upgrade-title">V1 Flaw Corrected</div>
-    <p class="upgrade-text">
-      V1 used a fixed $8 stop buffer regardless of market conditions. At $2,000
-      Gold this is 0.40%. At $3,200 Gold this is 0.25% — proportionally tighter,
-      getting stopped out more easily. V2 uses Daily ATR so your stop scales
-      with actual volatility.
-    </p>
-  </div>
-</div>
-
-<div class="v2-h3">Stop Placement — Two Methods, Use the Wider</div>
-<div class="math-box"><span class="c-dim">// Method 1: ATR-Based Stop</span>
-Daily_ATR = 14-period ATR on the Daily chart
-Buffer    = 1.5 × Daily_ATR
-
-<span class="result">Long Stop  = Put Wall  − Buffer</span>
-<span class="result">Short Stop = Call Wall + Buffer</span>
-
-<span class="c-dim">// Example: Daily ATR = $28. Buffer = $42.
-// Put Wall at $3,150. Stop placed at $3,108.</span>
-
-<span class="c-dim">// Method 2: Structural Stop</span>
-Look at the 4H chart.
-Find the most recent 4H swing low (for longs) or swing high (for shorts).
-<span class="result">Stop = 1 tick below the 4H swing low</span>
-
-<span class="c-dim">// Take whichever gives a WIDER stop.
-// Never tighten the stop from these levels.
-// Never widen the stop once set.</span>
-
-<span class="c-dim">// VIX Adjustment:</span>
-VIX 20–30:  multiply buffer by 1.3  (wider stop, smaller size)
-VIX > 30:   multiply buffer by 1.7  (much wider, much smaller size)</div>
-
-<div class="v2-h3">Position Sizing — Volatility-Adjusted</div>
-<div class="math-box"><span class="c-dim">// Step 1: Dollar risk per unit</span>
-<span class="result">Dollar_Risk_Per_Unit = Entry_Price − Stop_Price  (for longs)</span>
-
-<span class="c-dim">// Step 2: Base position size</span>
-Account_Size    = your total account value
-Risk_Percent    = 1.0%  (or 0.5% for first 20 trades)
-Max_Dollar_Risk = Account_Size × Risk_Percent
-<span class="result">Base_Size = Max_Dollar_Risk / Dollar_Risk_Per_Unit</span>
-
-<span class="c-dim">// Step 3: Setup score multiplier</span>
-Score 9–10:  use 1.5× Base  ← size up on elite setups
-Score 7–8:   use 1.0× Base  ← standard size
-Score ≤ 6:   DO NOT TRADE
-
-<span class="c-dim">// Step 4: Account heat check (hard limit)</span>
-Total_Open_Risk = sum of risk across ALL open trades
-<span class="result">HARD LIMIT: Total_Open_Risk must never exceed 5% of account</span>
-<span class="c-dim">If adding this trade would breach 5%, reduce size or skip.</span></div>
-
-<div class="v2-h3">Target Structure — 4 Exits</div>
-<div class="code-block"><span class="c-gold">LONG TRADE (from Put Wall):</span>
-
-Entry:  VWAP reclaim price after sweep
-Stop:   max(ATR-based, structural) → calculated above
-Risk:   Entry − Stop = 1R
-
-TP1:  Entry + 1.0R  → Close 40% of position
-      Move stop to: Entry (breakeven)
-
-TP2:  Entry + 2.0R  → Close 30% of position
-      Move stop to: TP1
-
-TP3:  Max Pain level → Close 20% of position
-      Move stop to: TP2
-
-TP4:  Call Wall      → Close final 10%
-      Maximum institutional target.
-
-<span class="c-dim">// V2 Change: 4 exits (40/30/20/10) vs V1's 3 (50/25/25)
-// The 10% runner captures the full move on elite setups.
-// In choppy weeks TP3/TP4 rarely hit — that's fine.
-// The 1:1 TP1 closes the book on risk quickly.</span></div>
-
-<div class="v2-h3">The 25% Kelly Sizing Overlay (Advanced)</div>
-<div class="info-box">
-  <div class="info-title">For traders with 50+ historical trades logged</div>
-  <p class="box-p">
-    Once you have 50+ real trades, calculate your historical win rate (W) and
-    average win/loss ratio (R). Apply 25% Kelly fraction:
-    <code>Full_Kelly = W − (1−W)/R</code> then
-    <code>Multiplier = 0.25 × Full_Kelly</code>.
-    This adjusts the base 1% — never replaces it.
-    25% Kelly is mathematically safe. Never use full Kelly.
-  </p>
-</div>
-""")
-
-
-# ══════════════════════════════════════════════════════════════
-# TAB 7 — SCORING
-# ══════════════════════════════════════════════════════════════
-with tabs[7]:
-    wrap("""
-<span class="section-label">New in V2</span>
-<div class="v2-h2">The Confluence Scoring System</div>
-<p class="v2-p">
-  V1 had no scoring — all pillars agreeing was binary. V2 assigns points to
-  each factor. This answers the question V1 couldn't:
-  <em>how confident should I be in this setup?</em>
-  Only trade 7+. Size up at 9+.
-</p>
-
-<table class="score-table">
-<thead>
-  <tr><th>Factor</th><th>Condition</th><th style="text-align:right">Pts</th></tr>
-</thead>
-<tbody>
-  <tr class="row-header"><td colspan="3">Institutional Positioning — Max 4</td></tr>
-  <tr>
-    <td>IPI Signal</td>
-    <td>IPI &gt; 75 (strong bullish) or &lt; 25 (strong bearish)</td>
-    <td class="pts">2</td>
-  </tr>
-  <tr>
-    <td>IPI Signal</td>
-    <td>IPI 55–75 or 25–45 (mild directional bias)</td>
-    <td class="pts">1</td>
-  </tr>
-  <tr>
-    <td>COT Momentum</td>
-    <td>2+ consecutive weeks same-direction, accelerating</td>
-    <td class="pts">1</td>
-  </tr>
-  <tr>
-    <td>Commercial Confirmation</td>
-    <td>Commercial IPI aligns with MM IPI at extreme</td>
-    <td class="pts">1</td>
-  </tr>
-  <tr class="row-header"><td colspan="3">Macro Context — Max 2</td></tr>
-  <tr>
-    <td>Real Yields</td>
-    <td>Falling (for longs) or rising (for shorts)</td>
-    <td class="pts">1</td>
-  </tr>
-  <tr>
-    <td>DXY Alignment</td>
-    <td>DXY below 20W EMA and falling (for Gold longs)</td>
-    <td class="pts">1</td>
-  </tr>
-  <tr class="row-header"><td colspan="3">Options Intelligence — Max 3</td></tr>
-  <tr>
-    <td>Wall Strength</td>
-    <td>OI stable or growing since Monday</td>
-    <td class="pts">1</td>
-  </tr>
-  <tr>
-    <td>Wall Proximity</td>
-    <td>Price within 0.5% of wall level</td>
-    <td class="pts">1</td>
-  </tr>
-  <tr>
-    <td>IV Skew</td>
-    <td>Elevated put premium (&gt;3% skew) on a long setup</td>
-    <td class="pts">1</td>
-  </tr>
-  <tr class="row-header"><td colspan="3">Market Structure — Max 2</td></tr>
-  <tr>
-    <td>Weekly Structure</td>
-    <td>Trade aligns with weekly trend direction</td>
-    <td class="pts">1</td>
-  </tr>
-  <tr>
-    <td>4H Structure</td>
-    <td>Trade aligns with 4H swing structure</td>
-    <td class="pts">1</td>
-  </tr>
-  <tr class="row-header"><td colspan="3">Entry Quality — Max 2</td></tr>
-  <tr>
-    <td>VWAP Sweep</td>
-    <td>Displacement ≥ $5 below VWAP before reclaim</td>
-    <td class="pts">1</td>
-  </tr>
-  <tr>
-    <td>Candle Pattern</td>
-    <td>Engulfing, hammer, or volume spike on reversal bar</td>
-    <td class="pts">1</td>
-  </tr>
-</tbody>
-</table>
-
-<div class="v2-h3">Score Interpretation</div>
-<div class="score-grid">
-  <div class="score-display">
-    <div class="score-circle">
-      <span class="score-num">9+</span>
-      <span class="score-max">/14</span>
-    </div>
-    <div>
-      <div class="score-lbl">Elite Setup &nbsp;<span class="pill pill-green">Trade 1.5× size</span></div>
-      <div class="score-dsc">
-        Rare — maybe 3–4 times per quarter. Size up and let it run to TP4.
-        These setups define your quarter.
+def main():
+    utc_now = datetime.now(pytz.utc)
+    in_kz   = is_kill_zone()
+    in_mkt  = is_market_open()
+
+    # ── LOAD ALL DATA ────────────────────────────────────────
+    with st.spinner(""):
+        gold = fetch_gold()
+        opts = fetch_options()
+        cot  = fetch_cot()
+        dxy  = fetch_dxy()
+        vix  = fetch_vix()
+
+    score, score_items = score_setup(gold, opts, cot, dxy, vix)
+
+    # ── DETERMINE OVERALL BIAS ───────────────────────────────
+    bias_str   = cot["bias"]   if cot  else "UNKNOWN"
+    ipi_val    = cot["ipi"]    if cot  else 50
+    vix_val    = vix["value"]  if vix  else 0
+    vix_regime = vix["regime"] if vix  else "UNKNOWN"
+
+    is_bull    = "BULLISH" in bias_str
+    is_bear    = "BEARISH" in bias_str
+    is_neutral = "NEUTRAL" in bias_str or "UNKNOWN" in bias_str
+    vix_crisis = vix_val > 40 if vix else False
+
+    # ── TOPBAR ───────────────────────────────────────────────
+    kz_html = (
+        '<span class="kz-on"><span class="live-dot"></span>KILL ZONE</span>'
+        if in_kz else
+        '<span class="kz-off">● OUTSIDE KILL ZONE</span>'
+    )
+    st.markdown(f"""
+    <div class="topbar">
+      <div class="topbar-left">
+        <span class="topbar-logo">🏅 GOLD INSTITUTIONAL EDGE</span>
+        <span class="topbar-version">V2.0</span>
+      </div>
+      <div class="topbar-right">
+        {kz_html}
+        <span class="live-badge">
+          <span class="live-dot"></span>LIVE
+        </span>
+        <span class="topbar-time">{utc_now.strftime('%a %d %b · %H:%M UTC')}</span>
       </div>
     </div>
-  </div>
-  <div class="score-display">
-    <div class="score-circle" style="border-color:#4A9EDB;background:rgba(74,158,219,0.08)">
-      <span class="score-num" style="color:#4A9EDB">7–8</span>
-      <span class="score-max">/14</span>
-    </div>
-    <div>
-      <div class="score-lbl">Valid Setup &nbsp;<span class="pill pill-blue">Standard size</span></div>
-      <div class="score-dsc">
-        Your bread and butter. 1× risk, normal TP structure.
-        Run the full protocol. 1–3 per week in good conditions.
+    """, unsafe_allow_html=True)
+
+    # ── OPEN PAGE WRAPPER ─────────────────────────────────────
+    st.markdown('<div class="page">', unsafe_allow_html=True)
+
+    # ── HERO BIAS BANNER ─────────────────────────────────────
+    price_now = gold["price"] if gold else "N/A"
+    chg_now   = gold["chg"]   if gold else 0
+    chg_pct   = gold["chg_pct"] if gold else 0
+    chg_sign  = "+" if chg_now >= 0 else ""
+
+    if vix_crisis:
+        hero_class = "hero-bear"
+        hero_icon  = "🚨"
+        hero_color = "#FF4D6A"
+        hero_dir   = "TRADING PAUSED"
+        hero_sub   = "VIX above 40 — crisis regime. No edge in this environment. Wait for VIX to fall below 30."
+    elif is_bull:
+        hero_class = "hero-bull"
+        hero_icon  = "🟢"
+        hero_color = "#00D395"
+        hero_dir   = "BULLISH BIAS"
+        hero_sub   = (
+            f"COT: Managed Money positioned LONG · IPI = {ipi_val} · "
+            f"Only take BUY setups this week · "
+            f"Wait for Put Wall touch + VWAP reclaim"
+        )
+    elif is_bear:
+        hero_class = "hero-bear"
+        hero_icon  = "🔴"
+        hero_color = "#FF4D6A"
+        hero_dir   = "BEARISH BIAS"
+        hero_sub   = (
+            f"COT: Managed Money positioned SHORT · IPI = {ipi_val} · "
+            f"Only take SELL setups this week · "
+            f"Wait for Call Wall touch + VWAP rejection"
+        )
+    else:
+        hero_class = "hero-neutral"
+        hero_icon  = "⚪"
+        hero_color = "#F0A030"
+        hero_dir   = "NEUTRAL — NO TRADES"
+        hero_sub   = (
+            f"COT: No clear institutional direction · IPI = {ipi_val} · "
+            f"IPI in neutral zone (45–55) · "
+            f"No new positions this week"
+        )
+
+    opts_ok = opts and not opts.get("error")
+    pw_str  = f"${opts['put_wall']:,.0f}"    if opts_ok else "N/A"
+    cw_str  = f"${opts['call_wall']:,.0f}"   if opts_ok else "N/A"
+    mp_str  = f"${opts['max_pain']:,.0f}"    if opts_ok else "N/A"
+
+    st.markdown(f"""
+    <div class="{hero_class}">
+      <div class="hero-left">
+        <div class="hero-icon">{hero_icon}</div>
+        <div>
+          <div class="hero-direction" style="color:{hero_color}">{hero_dir}</div>
+          <div class="hero-sub">{hero_sub}</div>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="hero-tag">
+          <div class="hero-tag-label">GOLD PRICE</div>
+          <div class="hero-tag-value">${price_now:,.2f}</div>
+        </div>
+        <div class="hero-tag">
+          <div class="hero-tag-label">TODAY</div>
+          <div class="hero-tag-value" style="color:{'#00D395' if chg_now>=0 else '#FF4D6A'}">{chg_sign}{chg_now} ({chg_sign}{chg_pct}%)</div>
+        </div>
+        <div class="hero-tag">
+          <div class="hero-tag-label">IPI SCORE</div>
+          <div class="hero-tag-value">{ipi_val}</div>
+        </div>
+        <div class="hero-tag">
+          <div class="hero-tag-label">SETUP SCORE</div>
+          <div class="hero-tag-value" style="color:{'#00D395' if score>=7 else '#F0A030' if score>=5 else '#FF4D6A'}">{score}/14</div>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="score-display">
-    <div class="score-circle" style="border-color:#E09A2A;background:rgba(224,154,42,0.08)">
-      <span class="score-num" style="color:#E09A2A">5–6</span>
-      <span class="score-max">/14</span>
-    </div>
-    <div>
-      <div class="score-lbl">Marginal &nbsp;<span class="pill pill-amber">Do not trade</span></div>
-      <div class="score-dsc">
-        Too many factors missing. Paper trade only.
-        Log it as an observation, not a live trade.
+    """, unsafe_allow_html=True)
+
+    # ── SCORE BAR ─────────────────────────────────────────────
+    score_pct = round((score / 14) * 100)
+    if score >= 9:
+        s_color  = "#00D395"
+        s_text   = "ELITE SETUP"
+        s_class  = "pass"
+        s_bg     = "rgba(0,211,149,0.12)"
+        s_brd    = "rgba(0,211,149,0.3)"
+    elif score >= 7:
+        s_color  = "#4A9EDB"
+        s_text   = "VALID — TRADE IT"
+        s_class  = "pass"
+        s_bg     = "rgba(74,158,219,0.12)"
+        s_brd    = "rgba(74,158,219,0.3)"
+    elif score >= 5:
+        s_color  = "#F0A030"
+        s_text   = "MARGINAL — SKIP"
+        s_class  = "warn"
+        s_bg     = "rgba(240,160,48,0.12)"
+        s_brd    = "rgba(240,160,48,0.3)"
+    else:
+        s_color  = "#FF4D6A"
+        s_text   = "NO SETUP — WAIT"
+        s_class  = "fail"
+        s_bg     = "rgba(255,77,106,0.12)"
+        s_brd    = "rgba(255,77,106,0.3)"
+
+    st.markdown(f"""
+    <div class="score-bar-wrap">
+      <div>
+        <div class="mc-label" style="margin-bottom:4px">CONFLUENCE SCORE</div>
+        <div class="score-num-big" style="color:{s_color}">{score}</div>
+      </div>
+      <div class="score-label-area">
+        <div class="score-title">Out of 14 possible points</div>
+        <div class="score-bar-bg">
+          <div class="score-bar-fill"
+               style="width:{score_pct}%;background:{s_color}"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+        <div class="score-verdict"
+             style="background:{s_bg};border:1px solid {s_brd};color:{s_color}">
+          {s_text}
+        </div>
+        {'<div class="score-verdict" style="background:rgba(0,211,149,0.1);border:1px solid rgba(0,211,149,0.25);color:#00D395">SIZE UP 1.5×</div>' if score >= 9 else ''}
       </div>
     </div>
-  </div>
-  <div class="score-display">
-    <div class="score-circle" style="border-color:#6A6660;background:rgba(100,100,100,0.05)">
-      <span class="score-num" style="color:#6A6660">0–4</span>
-      <span class="score-max">/14</span>
-    </div>
-    <div>
-      <div class="score-lbl">No Setup &nbsp;<span class="pill pill-grey">Wait</span></div>
-      <div class="score-dsc">
-        No edge this session. Walk away. Protecting capital on bad weeks
-        is how you stay in the game for the good weeks.
+    """, unsafe_allow_html=True)
+
+    # ── TOP METRIC STRIP ──────────────────────────────────────
+    st.markdown('<div class="sec-head">Live Market Data</div>',
+                unsafe_allow_html=True)
+
+    vwap_val  = gold["vwap"]   if gold and gold["vwap"] else None
+    above_v   = gold["above_vwap"] if gold else None
+    high_val  = gold["high"]   if gold else None
+    low_val   = gold["low"]    if gold else None
+
+    vwap_color = "mc-green" if above_v else "mc-red"
+    vwap_sub   = "Price above VWAP ↑" if above_v else "Price below VWAP ↓"
+    vwap_top   = "bull" if above_v else "bear"
+    price_top  = "bull" if (chg_now >= 0 if gold else False) else "bear"
+
+    dxy_color = "mc-red" if (dxy and dxy["above_ema"]) else "mc-green"
+    dxy_top   = "bear"   if (dxy and dxy["above_ema"]) else "bull"
+
+    vix_color = (
+        "mc-green" if vix_regime == "NORMAL" else
+        "mc-red"   if vix_regime in ("HIGH","CRISIS") else
+        "mc-amber"
+    )
+    vix_top = (
+        "bull" if vix_regime == "NORMAL" else
+        "bear" if vix_regime in ("HIGH","CRISIS") else
+        "amber"
+    )
+
+    st.markdown(f"""
+    <div class="metric-row">
+      <div class="metric-card {price_top}">
+        <div class="mc-label">Gold Price</div>
+        <div class="mc-value mc-gold">${price_now:,.2f}</div>
+        <div class="mc-sub" style="color:{'#00D395' if chg_now>=0 else '#FF4D6A'}">
+          {chg_sign}{chg_now} ({chg_sign}{chg_pct}%) today
+        </div>
+      </div>
+      <div class="metric-card {vwap_top}">
+        <div class="mc-label">VWAP</div>
+        <div class="mc-value {vwap_color}">${f"{vwap_val:,.2f}" if vwap_val else "N/A"}</div>
+        <div class="mc-sub">{vwap_sub}</div>
+      </div>
+      <div class="metric-card bull">
+        <div class="mc-label">Put Wall — Support</div>
+        <div class="mc-value mc-green">{pw_str}</div>
+        <div class="mc-sub">
+          {f"${abs(gold['price'] - opts['put_wall']):,.0f} from price" if gold and opts_ok else "Options data unavailable"}
+        </div>
+      </div>
+      <div class="metric-card bear">
+        <div class="mc-label">Call Wall — Resistance</div>
+        <div class="mc-value mc-red">{cw_str}</div>
+        <div class="mc-sub">
+          {f"${abs(opts['call_wall'] - gold['price']):,.0f} from price" if gold and opts_ok else "Options data unavailable"}
+        </div>
+      </div>
+      <div class="metric-card gold">
+        <div class="mc-label">Max Pain</div>
+        <div class="mc-value mc-gold">{mp_str}</div>
+        <div class="mc-sub">Weekly expiry magnet</div>
+      </div>
+      <div class="metric-card amber">
+        <div class="mc-label">Day Range</div>
+        <div class="mc-value mc-amber">
+          ${f"{gold['low']:,.0f}" if gold else "N/A"}–${f"{gold['high']:,.0f}" if gold else "N/A"}
+        </div>
+        <div class="mc-sub">
+          Range: ${f"{round(gold['high']-gold['low'],1):,.1f}" if gold else "N/A"}
+        </div>
       </div>
     </div>
-  </div>
-</div>
+    """, unsafe_allow_html=True)
 
-<div class="v2-hr"></div>
-<div class="v2-h3">Hard Exclusion Rules — Override Everything</div>
-<div class="code-block"><span class="c-red">ABSOLUTE NO-TRADE CONDITIONS:</span>
+    # ── SECOND METRIC ROW ─────────────────────────────────────
+    ipi_color = (
+        "mc-green" if ipi_val > 55 else
+        "mc-red"   if ipi_val < 45 else
+        "mc-amber"
+    )
+    cot_chg   = cot["change"] if cot else 0
+    cot_date  = cot["date"]   if cot else "N/A"
+    pc_val    = opts["pc_ratio"] if opts_ok else None
+    pc_color  = "mc-green" if (pc_val and pc_val > 1.0) else "mc-amber"
 
-  ✗  Within 60 minutes BEFORE or AFTER:
-       FOMC rate decision
-       Non-Farm Payrolls (NFP)
-       US CPI  /  US PCE  /  US PPI
-       Any Fed Chair speech
-
-  ✗  VIX above 40
-
-  ✗  IPI in neutral zone (45–55)
-
-  ✗  Score below 7
-
-  ✗  Total open risk already at 5% of account
-
-  ✗  First 30 minutes of day session open
-     (VWAP has insufficient data before 07:30 UTC)
-
-  ✗  GLD options showing zero OI (data fetch error)
-
-<span class="c-dim">// Check economic calendar every Sunday evening.
-// Mark all exclusion windows before the week starts.
-// These are pre-planned — not decisions made under pressure.</span></div>
-""")
-
-
-# ══════════════════════════════════════════════════════════════
-# TAB 8 — ROUTINE
-# ══════════════════════════════════════════════════════════════
-with tabs[8]:
-    wrap("""
-<span class="section-label">Operational Framework</span>
-<div class="v2-h2">The Weekly Operating Routine</div>
-
-<div class="weekly-grid">
-  <div class="week-day">
-    <div class="week-day-name">Sun</div>
-    <div class="week-day-items">Check econ calendar. Mark exclusion zones for the week.</div>
-  </div>
-  <div class="week-day active">
-    <div class="week-day-name">Fri</div>
-    <div class="week-day-items">COT released. Calculate IPI. Set directional bias for next week.</div>
-  </div>
-  <div class="week-day active">
-    <div class="week-day-name">Mon</div>
-    <div class="week-day-items">Full setup ritual. Mark all levels. Score pre-conditions.</div>
-  </div>
-  <div class="week-day">
-    <div class="week-day-name">Tue</div>
-    <div class="week-day-items">Update OI decay. Check wall strength. Kill zone watch.</div>
-  </div>
-  <div class="week-day">
-    <div class="week-day-name">Wed</div>
-    <div class="week-day-items">OI check. Mid-week TP adjustment if needed.</div>
-  </div>
-  <div class="week-day">
-    <div class="week-day-name">Thu</div>
-    <div class="week-day-items">Near-term OI expiring. Switch to next week's expiry levels.</div>
-  </div>
-  <div class="week-day">
-    <div class="week-day-name">Fri</div>
-    <div class="week-day-items">Close runners before 15:00 UTC. Read new COT after close.</div>
-  </div>
-</div>
-
-<div class="v2-h3">Friday Evening — 15 Minutes</div>
-<div class="code-block">1. Download CFTC Disaggregated COT — Gold (/GC) from cftc.gov
-2. Calculate MM Net Position this week vs last week
-3. Update your 52-week IPI spreadsheet
-4. Calculate IPI value (0–100)
-5. Check Commercial IPI for confirmation
-6. Record in journal: IPI, direction, bias for next week
-7. If IPI 45–55 → write "NO TRADES NEXT WEEK" and close laptop</div>
-
-<div class="v2-h3">Monday Morning — Full Setup Ritual — 30 Minutes</div>
-<div class="code-block">1. Check Weekly chart:
-   → Trend direction? Above/below 200W EMA?
-   → Any weekly FVGs nearby?
-
-2. Check Daily chart:
-   → PDH, PDL — mark on chart
-   → Any daily FVGs in play?
-   → Mark prior-day VWAP as reference
-
-3. Pull GLD options chain (Yahoo Finance or Barchart):
-   → Identify Put Wall, Call Wall, Max Pain
-   → Record baseline OI at key strikes for the week
-   → Note IV skew reading
-
-4. Check macro inputs:
-   → FRED: 10Y TIPS real yield vs last week
-   → DXY: above or below 20W EMA?
-   → VIX: what regime are we in today?
-
-5. Check economic calendar:
-   → Mark all exclusion windows this week in red
-
-6. Score the pre-conditions (before seeing intraday price):
-   IPI points:              ? / 4
-   COT momentum:            ? / 1
-   Commercial confirmation: ? / 1
-   Real yields:             ? / 1
-   DXY:                     ? / 1
-   Pre-condition score:     ? / 8
-
-7. If pre-condition score < 4 → reduced week.
-   Only take 9+ setups. Size at 0.5%.</div>
-
-<div class="v2-h3">Performance Log — What to Record Every Trade</div>
-<div class="code-block"><span class="c-gold">TRADE LOG — Every Field:</span>
-Date  |  Entry  |  Stop  |  TP1/TP2/TP3/TP4
-Direction  |  Size  |  Score  |  IPI at entry
-Result  |  R-multiple  |  Which TP hit  |  How stopped out
-
-<span class="c-gold">POST-TRADE NOTES (write within 24 hours):</span>
-→ Was the IPI reading correct for this week?
-→ Did the wall hold cleanly or was there a false break first?
-→ Did the VWAP entry trigger cleanly?
-→ Was there an FVG or structure level I didn't score?
-→ If stopped out: was stop placement logical in hindsight?
-
-<span class="c-gold">REVIEW EVERY 20 TRADES:</span>
-→ Win rate by score tier (7–8 vs 9+)
-→ Win rate by IPI tier (strong vs mild)
-→ Average R on winners vs average R on losers
-→ Kill zone performance (London vs New York)
-
-<span class="c-gold">CALIBRATE EVERY 50 TRADES:</span>
-→ Update 25% Kelly fraction with real data
-→ Identify which score factors predict wins best
-→ Adjust IPI thresholds if your data suggests different cutoffs</div>
-
-<div class="info-box">
-  <div class="info-title">The Only Honest Statement About Expectancy</div>
-  <p class="box-p">
-    This system cannot claim a specific win rate or R-multiple until you have
-    50+ documented trades. Until then: run the process faithfully, size small
-    (0.5% risk per trade for first 20 trades), and collect data. The edge
-    becomes provable through your own trade log — not through a document.
-    That is the most important upgrade V2 makes: intellectual honesty about
-    what is known and what must be discovered empirically.
-  </p>
-</div>
-""")
-
-
-# ══════════════════════════════════════════════════════════════
-# TAB 9 — CHEAT SHEET
-# ══════════════════════════════════════════════════════════════
-with tabs[9]:
-    wrap("""
-<span class="section-label">Reference</span>
-<div class="v2-h2">The V2 Cheat Sheet</div>
-
-<div class="cheat">
-  <div class="cheat-header">Gold Institutional Edge V2.0 — Quick Reference</div>
-  <div class="cheat-body">
-    <div class="cheat-row">
-      <span class="cheat-step">FRI</span>
-      <span class="cheat-text">
-        <strong>Calculate IPI.</strong>
-        Normalize MM net vs 52-week range.
-        Bullish &gt;55 · Bearish &lt;45 · Neutral (45–55) = no trades this week.
-      </span>
+    st.markdown(f"""
+    <div class="metric-row-4">
+      <div class="metric-card {'bull' if ipi_val>55 else 'bear' if ipi_val<45 else 'amber'}">
+        <div class="mc-label">IPI Score</div>
+        <div class="mc-value {ipi_color}">{ipi_val}</div>
+        <div class="mc-sub">{bias_str} · as of {cot_date}</div>
+      </div>
+      <div class="metric-card {'bull' if cot_chg>0 else 'bear'}">
+        <div class="mc-label">COT Weekly Change</div>
+        <div class="mc-value {'mc-green' if cot_chg>0 else 'mc-red'}">
+          {'↑' if cot_chg>0 else '↓'} {abs(cot_chg):,}
+        </div>
+        <div class="mc-sub">Managed Money net contracts</div>
+      </div>
+      <div class="metric-card {vix_top}">
+        <div class="mc-label">VIX Regime</div>
+        <div class="mc-value {vix_color}">{vix_val if vix else 'N/A'}</div>
+        <div class="mc-sub">{vix_regime} — {'normal, trade freely' if vix_regime=='NORMAL' else 'reduce size 25%' if vix_regime=='ELEVATED' else 'reduce size 50%' if vix_regime=='HIGH' else 'PAUSE ALL TRADING'}</div>
+      </div>
+      <div class="metric-card {dxy_top}">
+        <div class="mc-label">DXY — US Dollar</div>
+        <div class="mc-value {dxy_color}">{dxy['price'] if dxy else 'N/A'}</div>
+        <div class="mc-sub">{'Above' if dxy and dxy['above_ema'] else 'Below'} 20W EMA {f'({dxy[\"ema20\"]})' if dxy else ''} · {dxy['trend'] if dxy else ''}</div>
+      </div>
     </div>
-    <div class="cheat-row">
-      <span class="cheat-step">MON AM</span>
-      <span class="cheat-text">
-        <strong>Macro check.</strong>
-        Real yields direction. DXY vs 20W EMA. VIX regime.
-        Mark economic calendar exclusion windows for the week.
-      </span>
-    </div>
-    <div class="cheat-row">
-      <span class="cheat-step">MON AM</span>
-      <span class="cheat-text">
-        <strong>Options levels.</strong>
-        Pull GLD chain. Note Put Wall, Call Wall, Max Pain.
-        Record baseline OI at key strikes.
-      </span>
-    </div>
-    <div class="cheat-row">
-      <span class="cheat-step">DAILY</span>
-      <span class="cheat-text">
-        <strong>OI decay check.</strong>
-        Is Put Wall OI stable?
-        Down &gt;25% = reduce size 30%.
-        Down &gt;50% = ignore level entirely.
-      </span>
-    </div>
-    <div class="cheat-row">
-      <span class="cheat-step">SESSION</span>
-      <span class="cheat-text">
-        <strong>MTF structure.</strong>
-        Weekly trend. 4H structure. Daily FVGs. PDH / PDL.
-        All must align with trade direction before continuing.
-      </span>
-    </div>
-    <div class="cheat-row">
-      <span class="cheat-step">TRIGGER</span>
-      <span class="cheat-text">
-        <strong>Entry checklist.</strong>
-        Wall touched → price sweeps ≥$5 below VWAP →
-        closes back above VWAP → candlestick confirmation.
-      </span>
-    </div>
-    <div class="cheat-row">
-      <span class="cheat-step">SCORE</span>
-      <span class="cheat-text">
-        <strong>Must be 7+ to trade.</strong>
-        9+ = 1.5× size.
-        5–6 = paper trade only.
-        Below 5 = walk away completely.
-      </span>
-    </div>
-    <div class="cheat-row">
-      <span class="cheat-step">STOP</span>
-      <span class="cheat-text">
-        <strong>max(1.5× Daily ATR, structural swing low).</strong>
-        Never fixed dollars. ×1.3 for VIX 20–30. ×1.7 for VIX &gt;30.
-      </span>
-    </div>
-    <div class="cheat-row">
-      <span class="cheat-step">TARGETS</span>
-      <span class="cheat-text">
-        <strong>TP1 1R → close 40%, move SL to entry.</strong>
-        TP2 2R → close 30%, move SL to TP1.
-        TP3 Max Pain → close 20%, move SL to TP2.
-        TP4 Call Wall → close final 10%.
-      </span>
-    </div>
-    <div class="cheat-row">
-      <span class="cheat-step">JOURNAL</span>
-      <span class="cheat-text">
-        <strong>Every trade logged.</strong>
-        IPI, score, entry, result, why it worked or failed.
-        Review every 20 trades. Calibrate every 50.
-      </span>
-    </div>
-    <div class="cheat-row">
-      <span class="cheat-step">NEVER</span>
-      <span class="cheat-text">
-        <strong>Trade within 60 min of FOMC / NFP / CPI / PCE / PPI.</strong>
-        Trade with VIX &gt;40. Move stop further away. Revenge trade.
-      </span>
-    </div>
-  </div>
-</div>
+    """, unsafe_allow_html=True)
 
-<div class="card-grid-3" style="margin-top:24px">
-  <div class="v2-card">
-    <div class="v2-card-title">Min Score to Trade</div>
-    <div class="v2-card-value" style="color:#F0C060">7 / 14</div>
-    <div class="v2-card-sub">9+ = size up 1.5×</div>
-  </div>
-  <div class="v2-card">
-    <div class="v2-card-title">Stop Buffer</div>
-    <div class="v2-card-value" style="color:#4A9EDB">1.5× ATR</div>
-    <div class="v2-card-sub">or structural swing, whichever wider</div>
-  </div>
-  <div class="v2-card">
-    <div class="v2-card-title">Max Account Heat</div>
-    <div class="v2-card-value" style="color:#DD4444">5%</div>
-    <div class="v2-card-sub">total open risk across all positions</div>
-  </div>
-  <div class="v2-card">
-    <div class="v2-card-title">VWAP Min Displacement</div>
-    <div class="v2-card-value" style="color:#3DAA6A">$5.00</div>
-    <div class="v2-card-sub">below VWAP before reclaim counts</div>
-  </div>
-  <div class="v2-card">
-    <div class="v2-card-title">IPI Neutral Zone</div>
-    <div class="v2-card-value" style="color:#E09A2A">45 – 55</div>
-    <div class="v2-card-sub">no trades when IPI falls here</div>
-  </div>
-  <div class="v2-card">
-    <div class="v2-card-title">VIX Pause Level</div>
-    <div class="v2-card-value" style="color:#DD4444">40+</div>
-    <div class="v2-card-sub">stop all trading until below 30</div>
-  </div>
-</div>
-""")
+    # ── TWO COLUMN LAYOUT ─────────────────────────────────────
+    col1, col2 = st.columns([3, 2], gap="medium")
+
+    with col1:
+        # CHART
+        st.markdown('<div class="sec-head">Price Chart — 5 Min with Key Levels</div>',
+                    unsafe_allow_html=True)
+        fig = build_chart(gold, opts)
+        if fig:
+            st.plotly_chart(fig, use_container_width=True,
+                            config={"displayModeBar": False})
+        else:
+            st.markdown("""
+            <div class="info-strip">
+              ⏸ Chart unavailable — markets may be closed
+              or data provider is slow. Refresh in a moment.
+            </div>
+            """, unsafe_allow_html=True)
+
+        # COT CHART
+        st.markdown('<div class="sec-head">COT — Managed Money Net Position (8 Weeks)</div>',
+                    unsafe_allow_html=True)
+        fig2 = build_cot_chart(cot)
+        if fig2:
+            st.plotly_chart(fig2, use_container_width=True,
+                            config={"displayModeBar": False})
+        else:
+            st.markdown("""
+            <div class="info-strip">
+              COT data unavailable. Try refreshing.
+            </div>
+            """, unsafe_allow_html=True)
+
+    with col2:
+        # TRADE LEVELS
+        st.markdown('<div class="sec-head">Trade Levels — Current Setup</div>',
+                    unsafe_allow_html=True)
+
+        if gold and opts_ok:
+            p     = gold["price"]
+            v     = gold["vwap"] or p
+            atr_e = 28.0  # estimated daily ATR — user should check chart
+            stop_dist = round(1.5 * atr_e, 2)
+
+            if is_bull:
+                entry = p
+                stop  = round(opts["put_wall"] - stop_dist, 2)
+                risk  = round(entry - stop, 2)
+                tp1   = round(entry + risk * 1.0, 2)
+                tp2   = round(entry + risk * 2.0, 2)
+                tp3   = round(opts["max_pain"],    2)
+                tp4   = round(opts["call_wall"],   2)
+                dot_entry = "#FFFFFF"
+                dot_stop  = "#FF4D6A"
+            else:
+                entry = p
+                stop  = round(opts["call_wall"] + stop_dist, 2)
+                risk  = round(stop - entry, 2)
+                tp1   = round(entry - risk * 1.0, 2)
+                tp2   = round(entry - risk * 2.0, 2)
+                tp3   = round(opts["max_pain"],    2)
+                tp4   = round(opts["put_wall"],    2)
+                dot_entry = "#FFFFFF"
+                dot_stop  = "#FF4D6A"
+
+            levels = [
+                (dot_stop,  "#FF4D6A", "STOP LOSS",
+                 f"${stop:,.2f}", f"1.5× ATR below Put Wall · Risk = ${risk:,.2f}"),
+                (dot_entry, "#FFFFFF", "ENTRY",
+                 f"${entry:,.2f}", "Current price after VWAP reclaim"),
+                ("#00D395", "#00D395", "TP 1  — Close 40%",
+                 f"${tp1:,.2f}", "1:1 R/R · Move SL to entry"),
+                ("#00D395", "#4A9EDB", "TP 2  — Close 30%",
+                 f"${tp2:,.2f}", "1:2 R/R · Move SL to TP1"),
+                ("#00D395", "#F0C060", "TP 3  — Close 20%",
+                 f"${tp3:,.2f}", "Max Pain level · Move SL to TP2"),
+                ("#00D395", "#C9922A", "TP 4  — Close 10%",
+                 f"${tp4:,.2f}", "Opposite wall · Full move target"),
+            ]
+            rows = ""
+            for _, dot_c, name, price_str, desc in levels:
+                rows += f"""
+                <div class="trade-level-row">
+                  <div class="tl-left">
+                    <div class="tl-dot" style="background:{dot_c}"></div>
+                    <div>
+                      <div class="tl-name">{name}</div>
+                      <div class="tl-desc">{desc}</div>
+                    </div>
+                  </div>
+                  <div class="tl-price">{price_str}</div>
+                </div>"""
+
+            st.markdown(f"""
+            <div class="trade-panel">
+              <div class="trade-panel-header">
+                {'🟢 LONG SETUP (BUY)' if is_bull else '🔴 SHORT SETUP (SELL)' if is_bear else '⚪ NEUTRAL — NO TRADE'}
+                &nbsp;&nbsp;·&nbsp;&nbsp; Risk = ${risk:,.2f} per unit
+              </div>
+              {rows}
+            </div>
+            """, unsafe_allow_html=True)
+
+            st.markdown("""
+            <div class="info-strip">
+              ⚠️ Stop distance uses estimated ATR of $28.
+              Check your chart for the real 14-period Daily ATR
+              and adjust accordingly.
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown("""
+            <div class="info-strip">
+              Trade levels require live price and options data.
+              Options data is available Mon–Fri during US market hours.
+            </div>
+            """, unsafe_allow_html=True)
+
+        # CONFLUENCE CHECKLIST
+        st.markdown('<div class="sec-head">Confluence Checklist</div>',
+                    unsafe_allow_html=True)
+
+        rows_html = ""
+        for name, state, detail, pts in score_items:
+            icon = "✅" if state == "pass" else "❌" if state == "fail" else "⚠️" if state == "warn" else "ℹ️"
+            rows_html += f"""
+            <div class="check-item">
+              <div class="check-icon">{icon}</div>
+              <div class="check-body">
+                <div class="check-name {state}">{name}</div>
+                <div class="check-detail">{detail}</div>
+              </div>
+              <div class="check-right {state}">{pts}</div>
+            </div>"""
+
+        st.markdown(f"""
+        <div class="checklist">
+          <div class="checklist-header">Score: {score}/14 — {'TRADE ✓' if score>=7 else 'DO NOT TRADE ✗'}</div>
+          {rows_html}
+        </div>
+        """, unsafe_allow_html=True)
+
+    # ── OPTIONS DETAIL ROW ────────────────────────────────────
+    st.markdown('<div class="sec-head">Options Intelligence</div>',
+                unsafe_allow_html=True)
+
+    col3, col4, col5, col6 = st.columns(4, gap="medium")
+
+    with col3:
+        if opts_ok:
+            pc  = opts["pc_ratio"]
+            if   pc > 1.3: pc_sent = "Heavy put loading — bullish"
+            elif pc > 1.0: pc_sent = "Mild put premium — normal"
+            elif pc > 0.7: pc_sent = "Balanced"
+            else:          pc_sent = "Call-heavy — caution"
+            st.markdown(f"""
+            <div class="metric-card {'bull' if pc>1.0 else 'amber'}">
+              <div class="mc-label">Put/Call Ratio</div>
+              <div class="mc-value {'mc-green' if pc>1.0 else 'mc-amber'}">{pc}</div>
+              <div class="mc-sub">{pc_sent}</div>
+            </div>""", unsafe_allow_html=True)
+        else:
+            st.markdown("""
+            <div class="metric-card">
+              <div class="mc-label">Put/Call Ratio</div>
+              <div class="mc-value mc-amber">N/A</div>
+            </div>""", unsafe_allow_html=True)
+
+    with col4:
+        if opts_ok:
+            st.markdown(f"""
+            <div class="metric-card gold">
+              <div class="mc-label">Options Expiry</div>
+              <div class="mc-value mc-gold" style="font-size:15px">{opts['expiry']}</div>
+              <div class="mc-sub">Nearest weekly contract</div>
+            </div>""", unsafe_allow_html=True)
+        else:
+            st.markdown("""
+            <div class="metric-card">
+              <div class="mc-label">Options Expiry</div>
+              <div class="mc-value mc-amber">N/A</div>
+            </div>""", unsafe_allow_html=True)
+
+    with col5:
+        if opts_ok:
+            st.markdown(f"""
+            <div class="metric-card blue">
+              <div class="mc-label">GLD→XAUUSD Mult</div>
+              <div class="mc-value mc-blue">{opts['mult']}×</div>
+              <div class="mc-sub">Live conversion factor</div>
+            </div>""", unsafe_allow_html=True)
+        else:
+            st.markdown("""
+            <div class="metric-card">
+              <div class="mc-label">Multiplier</div>
+              <div class="mc-value mc-amber">N/A</div>
+            </div>""", unsafe_allow_html=True)
+
+    with col6:
+        if in_kz:
+            kz_msg   = "ACTIVE NOW"
+            kz_col   = "mc-green"
+            kz_top   = "bull"
+            kz_sub   = "London 07–10 or NY 12–15 UTC"
+        else:
+            h_now = utc_now.hour
+            if h_now < 7:
+                mins = (7 - h_now) * 60
+                kz_msg = f"London in ~{mins}min"
+            elif 10 <= h_now < 12:
+                mins = (12 - h_now) * 60
+                kz_msg = f"NY open in ~{mins}min"
+            elif h_now >= 15:
+                kz_msg = "Next: Tomorrow 07:00"
+            else:
+                kz_msg = "Inactive"
+            kz_col = "mc-amber"
+            kz_top = "amber"
+            kz_sub = "Outside London/NY window"
+        st.markdown(f"""
+        <div class="metric-card {kz_top}">
+          <div class="mc-label">Kill Zone</div>
+          <div class="mc-value {kz_col}" style="font-size:15px">{kz_msg}</div>
+          <div class="mc-sub">{kz_sub}</div>
+        </div>""", unsafe_allow_html=True)
+
+    # ── REFRESH BUTTON + LAST UPDATED ─────────────────────────
+    st.markdown('<div class="sec-head">Controls</div>',
+                unsafe_allow_html=True)
+
+    c1, c2, c3, c4 = st.columns([1, 1, 1, 3])
+    with c1:
+        if st.button("🔄 Refresh All Data"):
+            fetch_gold.clear()
+            fetch_options.clear()
+            fetch_cot.clear()
+            fetch_dxy.clear()
+            fetch_vix.clear()
+            st.rerun()
+    with c2:
+        if st.button("📊 Reload Chart"):
+            fetch_gold.clear()
+            st.rerun()
+    with c3:
+        if st.button("📋 Reload COT"):
+            fetch_cot.clear()
+            st.rerun()
+    with c4:
+        st.markdown(f"""
+        <div style="padding:8px 0;font-family:var(--mono);
+             font-size:10px;color:var(--text3)">
+          Last loaded: {utc_now.strftime('%H:%M:%S UTC')} ·
+          Price refreshes every 60s ·
+          Options every 5min ·
+          COT every hour
+        </div>
+        """, unsafe_allow_html=True)
+
+    # ── FOOTER ───────────────────────────────────────────────
+    st.markdown("""
+    <div class="footer">
+      GOLD INSTITUTIONAL EDGE V2.0 &nbsp;·&nbsp;
+      Data: Yahoo Finance / CFTC Public API &nbsp;·&nbsp;
+      For educational purposes only &nbsp;·&nbsp;
+      Not financial advice
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # ── AUTO REFRESH EVERY 60 SECONDS ────────────────────────
+    time.sleep(60)
+    fetch_gold.clear()
+    st.rerun()
+
+
+if __name__ == "__main__":
+    main()

@@ -20,7 +20,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# ── FULL CSS ─────────────────────────────────────────────────
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
@@ -64,7 +63,6 @@ html, body, .stApp {
 .block-container { padding: 0 !important; max-width: 100% !important; }
 section[data-testid="stSidebar"] { display: none; }
 
-/* ── TOPBAR ── */
 .topbar {
   background: var(--bg2);
   border-bottom: 1px solid var(--border);
@@ -112,7 +110,7 @@ section[data-testid="stSidebar"] { display: none; }
 }
 @keyframes blink {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.2; }
+  50%       { opacity: 0.2; }
 }
 .topbar-time {
   font-family: var(--mono);
@@ -120,10 +118,8 @@ section[data-testid="stSidebar"] { display: none; }
   color: var(--text3);
 }
 
-/* ── PAGE WRAPPER ── */
 .page { padding: 24px 32px 60px; max-width: 1400px; margin: 0 auto; }
 
-/* ── HERO SIGNAL BANNER ── */
 .hero-bull {
   background: linear-gradient(135deg, rgba(0,211,149,0.08) 0%, rgba(0,211,149,0.03) 100%);
   border: 1px solid var(--green-border);
@@ -172,11 +168,7 @@ section[data-testid="stSidebar"] { display: none; }
   line-height: 1;
   margin-bottom: 4px;
 }
-.hero-sub {
-  font-size: 13px;
-  color: var(--text2);
-  line-height: 1.5;
-}
+.hero-sub { font-size: 13px; color: var(--text2); line-height: 1.5; }
 .hero-right { display: flex; gap: 12px; flex-wrap: wrap; }
 .hero-tag {
   background: rgba(255,255,255,0.04);
@@ -190,7 +182,6 @@ section[data-testid="stSidebar"] { display: none; }
 .hero-tag-label { color: var(--text3); margin-bottom: 2px; }
 .hero-tag-value { color: var(--text); font-weight: 700; font-size: 13px; }
 
-/* ── SCORE BAR ── */
 .score-bar-wrap {
   background: var(--bg2);
   border: 1px solid var(--border);
@@ -218,11 +209,7 @@ section[data-testid="stSidebar"] { display: none; }
   flex: 1;
   min-width: 120px;
 }
-.score-bar-fill {
-  height: 100%;
-  border-radius: 4px;
-  transition: width 0.5s ease;
-}
+.score-bar-fill { height: 100%; border-radius: 4px; }
 .score-verdict {
   font-family: var(--mono);
   font-size: 11px;
@@ -234,7 +221,6 @@ section[data-testid="stSidebar"] { display: none; }
   white-space: nowrap;
 }
 
-/* ── METRIC GRID ── */
 .metric-row {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -262,11 +248,11 @@ section[data-testid="stSidebar"] { display: none; }
   height: 2px;
   background: var(--border);
 }
-.metric-card.bull::before { background: var(--green); }
-.metric-card.bear::before { background: var(--red); }
-.metric-card.gold::before { background: var(--gold); }
-.metric-card.blue::before { background: var(--blue); }
-.metric-card.amber::before { background: var(--amber); }
+.metric-card.bull::before   { background: var(--green); }
+.metric-card.bear::before   { background: var(--red);   }
+.metric-card.gold::before   { background: var(--gold);  }
+.metric-card.blue::before   { background: var(--blue);  }
+.metric-card.amber::before  { background: var(--amber); }
 
 .mc-label {
   font-family: var(--mono);
@@ -284,18 +270,13 @@ section[data-testid="stSidebar"] { display: none; }
   line-height: 1;
   margin-bottom: 4px;
 }
-.mc-sub {
-  font-size: 11px;
-  color: var(--text3);
-  margin-top: 4px;
-}
-.mc-green { color: var(--green) !important; }
-.mc-red   { color: var(--red)   !important; }
+.mc-sub  { font-size: 11px; color: var(--text3); margin-top: 4px; }
+.mc-green { color: var(--green)      !important; }
+.mc-red   { color: var(--red)        !important; }
 .mc-gold  { color: var(--gold-light) !important; }
-.mc-blue  { color: var(--blue)  !important; }
-.mc-amber { color: var(--amber) !important; }
+.mc-blue  { color: var(--blue)       !important; }
+.mc-amber { color: var(--amber)      !important; }
 
-/* ── SECTION HEADER ── */
 .sec-head {
   font-family: var(--mono);
   font-size: 10px;
@@ -315,30 +296,6 @@ section[data-testid="stSidebar"] { display: none; }
   background: var(--border);
 }
 
-/* ── CHART CARD ── */
-.chart-card {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  margin-bottom: 20px;
-}
-.chart-card-header {
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.chart-card-title {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text2);
-}
-
-/* ── CONFLUENCE CHECKLIST ── */
 .checklist {
   background: var(--bg2);
   border: 1px solid var(--border);
@@ -364,20 +321,9 @@ section[data-testid="stSidebar"] { display: none; }
   border-bottom: 1px solid rgba(201,146,42,0.05);
 }
 .check-item:last-child { border-bottom: none; }
-.check-icon {
-  font-size: 14px;
-  margin-top: 1px;
-  flex-shrink: 0;
-  width: 20px;
-  text-align: center;
-}
+.check-icon { font-size: 14px; margin-top: 1px; flex-shrink: 0; width: 20px; text-align: center; }
 .check-body { flex: 1; }
-.check-name {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text);
-  margin-bottom: 2px;
-}
+.check-name { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
 .check-name.pass { color: var(--green); }
 .check-name.fail { color: var(--text3); }
 .check-name.warn { color: var(--amber); }
@@ -395,7 +341,6 @@ section[data-testid="stSidebar"] { display: none; }
 .check-right.warn { color: var(--amber); background: var(--amber-dim); }
 .check-right.info { color: var(--blue);  background: var(--blue-dim);  }
 
-/* ── TRADE LEVELS ── */
 .trade-panel {
   background: var(--bg2);
   border: 1px solid var(--border);
@@ -421,73 +366,12 @@ section[data-testid="stSidebar"] { display: none; }
   border-bottom: 1px solid rgba(201,146,42,0.05);
 }
 .trade-level-row:last-child { border-bottom: none; }
-.tl-left { display: flex; align-items: center; gap: 10px; }
-.tl-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.tl-name { font-size: 13px; color: var(--text2); }
-.tl-desc { font-size: 11px; color: var(--text3); }
-.tl-price {
-  font-family: var(--mono);
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text);
-}
+.tl-left  { display: flex; align-items: center; gap: 10px; }
+.tl-dot   { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.tl-name  { font-size: 13px; color: var(--text2); }
+.tl-desc  { font-size: 11px; color: var(--text3); }
+.tl-price { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--text); }
 
-/* ── COT HISTORY ── */
-.cot-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 18px;
-  border-bottom: 1px solid rgba(201,146,42,0.05);
-}
-.cot-row:last-child { border-bottom: none; }
-.cot-date { font-family: var(--mono); font-size: 11px; color: var(--text3); width: 90px; flex-shrink: 0; }
-.cot-bar-wrap { flex: 1; height: 6px; background: var(--bg4); border-radius: 3px; overflow: hidden; }
-.cot-bar-fill { height: 100%; border-radius: 3px; }
-.cot-val { font-family: var(--mono); font-size: 11px; font-weight: 700; width: 80px; text-align: right; flex-shrink: 0; }
-
-/* ── ALERTS PANEL ── */
-.alert-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 10px 18px;
-  border-bottom: 1px solid rgba(201,146,42,0.05);
-}
-.alert-item:last-child { border-bottom: none; }
-.alert-time { font-family: var(--mono); font-size: 10px; color: var(--text3); width: 70px; flex-shrink: 0; padding-top: 2px; }
-.alert-msg { font-size: 12px; color: var(--text2); line-height: 1.5; }
-
-/* ── KILL ZONE INDICATOR ── */
-.kz-on {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: var(--green-dim);
-  border: 1px solid var(--green-border);
-  border-radius: 6px;
-  padding: 4px 10px;
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--green);
-  font-weight: 700;
-  letter-spacing: 0.05em;
-}
-.kz-off {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: rgba(74,90,106,0.15);
-  border: 1px solid rgba(74,90,106,0.2);
-  border-radius: 6px;
-  padding: 4px 10px;
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--text3);
-  letter-spacing: 0.05em;
-}
-
-/* ── INFO BOX ── */
 .info-strip {
   background: var(--blue-dim);
   border: 1px solid rgba(74,158,219,0.2);
@@ -499,7 +383,23 @@ section[data-testid="stSidebar"] { display: none; }
   line-height: 1.5;
 }
 
-/* ── FOOTER ── */
+.kz-on {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--green-dim);
+  border: 1px solid var(--green-border);
+  border-radius: 6px; padding: 4px 10px;
+  font-family: var(--mono); font-size: 10px;
+  color: var(--green); font-weight: 700;
+}
+.kz-off {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(74,90,106,0.15);
+  border: 1px solid rgba(74,90,106,0.2);
+  border-radius: 6px; padding: 4px 10px;
+  font-family: var(--mono); font-size: 10px;
+  color: var(--text3);
+}
+
 .footer {
   text-align: center;
   padding: 24px;
@@ -511,7 +411,6 @@ section[data-testid="stSidebar"] { display: none; }
   letter-spacing: 0.05em;
 }
 
-/* ── STREAMLIT OVERRIDES ── */
 div[data-testid="stButton"] button {
   background: var(--bg3) !important;
   color: var(--text2) !important;
@@ -527,13 +426,11 @@ div[data-testid="stButton"] button:hover {
   color: var(--gold-light) !important;
 }
 
-/* ── RESPONSIVE ── */
 @media (max-width: 900px) {
   .page { padding: 16px 16px 60px; }
   .metric-row { grid-template-columns: repeat(3, 1fr); }
   .metric-row-4 { grid-template-columns: repeat(2, 1fr); }
   .topbar { padding: 12px 16px; }
-  .hero-left { gap: 12px; }
   .hero-direction { font-size: 24px; }
 }
 @media (max-width: 600px) {
@@ -563,25 +460,21 @@ def fetch_gold():
         high_day = round(float(hist["High"].iloc[-288:].max()), 2)
         low_day  = round(float(hist["Low"].iloc[-288:].min()),  2)
 
-        # VWAP
-        today = hist[hist.index.date == hist.index[-1].date()]
+        today = hist[hist.index.date == hist.index[-1].date()].copy()
+        vwap  = None
         if not today.empty:
-            today = today.copy()
             today["TP"]   = (today["High"] + today["Low"] + today["Close"]) / 3
             today["TPxV"] = today["TP"] * today["Volume"]
-            vwap = round(
-                float(today["TPxV"].cumsum().iloc[-1]
-                      / today["Volume"].cumsum().iloc[-1]), 2
-            )
-        else:
-            vwap = None
+            cum_v = today["Volume"].cumsum().iloc[-1]
+            if cum_v > 0:
+                vwap = round(float(today["TPxV"].cumsum().iloc[-1] / cum_v), 2)
 
         return {
             "price": price, "prev": prev,
             "chg": chg, "chg_pct": chg_pct,
             "high": high_day, "low": low_day,
             "vwap": vwap,
-            "above_vwap": price > vwap if vwap else None,
+            "above_vwap": (price > vwap) if vwap else None,
             "hist": hist,
         }
     except Exception:
@@ -602,17 +495,16 @@ def fetch_options():
         puts  = ch.puts[ch.puts["openInterest"]  > 10].copy()
         if calls.empty or puts.empty:
             return None
-        pw  = float(puts.loc[puts["openInterest"].idxmax(),  "strike"])
-        cw  = float(calls.loc[calls["openInterest"].idxmax(),"strike"])
-
-        # max pain
+        pw = float(puts.loc[puts["openInterest"].idxmax(),   "strike"])
+        cw = float(calls.loc[calls["openInterest"].idxmax(), "strike"])
         strikes = sorted(set(calls["strike"].tolist() + puts["strike"].tolist()))
         pain = {}
         for s in strikes:
-            pain[s] = (calls[calls["strike"] > s]["openInterest"].sum()
-                     + puts[puts["strike"]  < s]["openInterest"].sum())
+            pain[s] = (
+                calls[calls["strike"] > s]["openInterest"].sum()
+              + puts[puts["strike"]  < s]["openInterest"].sum()
+            )
         mp = float(min(pain, key=pain.get))
-
         pc = round(puts["openInterest"].sum() / calls["openInterest"].sum(), 2)
         return {
             "put_wall":  round(pw  * mult, 2),
@@ -643,29 +535,35 @@ def fetch_cot():
             ml = int(r.get("m_money_positions_long_all",  0))
             ms = int(r.get("m_money_positions_short_all", 0))
             results.append({
-                "date":    r.get("report_date_as_yyyy_mm_dd","")[:10],
-                "mm_long": ml, "mm_short": ms,
-                "mm_net":  ml - ms,
+                "date":     r.get("report_date_as_yyyy_mm_dd", "")[:10],
+                "mm_long":  ml,
+                "mm_short": ms,
+                "mm_net":   ml - ms,
             })
         nets = [r["mm_net"] for r in results]
         hi   = max(nets)
         lo   = min(nets)
-        ipi  = round((nets[0] - lo) / (hi - lo) * 100, 1) if hi != lo else 50
+        ipi  = round((nets[0] - lo) / (hi - lo) * 100, 1) if hi != lo else 50.0
         chg  = nets[0] - nets[1]
-        acc  = (chg > 0 and nets[1] - nets[2] > 0) or (chg < 0 and nets[1] - nets[2] < 0)
+        acc  = (
+            (chg > 0 and (nets[1] - nets[2]) > 0)
+            or (chg < 0 and (nets[1] - nets[2]) < 0)
+        )
         if   ipi > 75: bias = "STRONG BULLISH"
         elif ipi > 55: bias = "MILD BULLISH"
         elif ipi < 25: bias = "STRONG BEARISH"
         elif ipi < 45: bias = "MILD BEARISH"
         else:          bias = "NEUTRAL"
         return {
-            "ipi": ipi, "bias": bias, "change": chg,
+            "ipi":          ipi,
+            "bias":         bias,
+            "change":       chg,
             "accelerating": acc,
-            "mm_net":   nets[0],
-            "mm_long":  results[0]["mm_long"],
-            "mm_short": results[0]["mm_short"],
-            "date":     results[0]["date"],
-            "history":  results[:8],
+            "mm_net":       nets[0],
+            "mm_long":      results[0]["mm_long"],
+            "mm_short":     results[0]["mm_short"],
+            "date":         results[0]["date"],
+            "history":      results[:8],
         }
     except Exception:
         return None
@@ -674,15 +572,18 @@ def fetch_cot():
 @st.cache_data(ttl=300)
 def fetch_dxy():
     try:
-        d = yf.Ticker("DX-Y.NYB").history(period="6mo", interval="1wk")
+        d     = yf.Ticker("DX-Y.NYB").history(period="6mo", interval="1wk")
         if d.empty:
             return None
-        price   = round(float(d["Close"].iloc[-1]), 2)
-        ema20   = round(float(d["Close"].ewm(span=20).mean().iloc[-1]), 2)
-        above   = price > ema20
-        trend   = "RISING" if d["Close"].iloc[-1] > d["Close"].iloc[-2] else "FALLING"
-        return {"price": price, "ema20": ema20,
-                "above_ema": above, "trend": trend}
+        price = round(float(d["Close"].iloc[-1]), 2)
+        ema20 = round(float(d["Close"].ewm(span=20).mean().iloc[-1]), 2)
+        trend = "RISING" if d["Close"].iloc[-1] > d["Close"].iloc[-2] else "FALLING"
+        return {
+            "price":     price,
+            "ema20":     ema20,
+            "above_ema": price > ema20,
+            "trend":     trend,
+        }
     except Exception:
         return None
 
@@ -714,115 +615,136 @@ def is_market_open():
 
 
 def score_setup(gold, opts, cot, dxy, vix):
-    """Returns score out of 14 and a breakdown list."""
-    s = 0
+    s     = 0
     items = []
+    opts_ok = opts and not opts.get("error")
 
     # IPI (max 2)
     if cot:
         ipi = cot["ipi"]
         if ipi > 75 or ipi < 25:
             s += 2
-            items.append(("IPI Extreme", "pass", f"IPI = {ipi}", "+2"))
+            items.append(("IPI Extreme", "pass",
+                           "IPI = " + str(ipi) + " — strong institutional conviction", "+2"))
         elif ipi > 55 or ipi < 45:
             s += 1
-            items.append(("IPI Directional", "pass", f"IPI = {ipi}", "+1"))
+            items.append(("IPI Directional", "pass",
+                           "IPI = " + str(ipi) + " — mild directional bias", "+1"))
         else:
-            items.append(("IPI Neutral Zone", "fail", f"IPI = {ipi} — no trade week", "0"))
+            items.append(("IPI Neutral Zone", "fail",
+                           "IPI = " + str(ipi) + " — no trade this week", "0"))
 
-        # Momentum (max 1)
+        # COT Momentum (max 1)
         if cot["accelerating"]:
             s += 1
             items.append(("COT Momentum Accelerating", "pass",
                            "2 consecutive weeks same direction", "+1"))
         else:
-            items.append(("COT Momentum", "fail", "Not accelerating", "0"))
+            items.append(("COT Momentum", "fail",
+                           "Not accelerating week-over-week", "0"))
     else:
         items.append(("COT / IPI", "warn", "Data unavailable", "?"))
 
-    # Real Yields — not fetched live (manual check note)
+    # Real Yields (manual check note)
     items.append(("Real Yields", "info",
-                   "Check FRED manually each Monday (DFII10)", "?"))
+                   "Check FRED manually each Monday — fred.stlouisfed.org/series/DFII10", "?"))
 
     # DXY (max 1)
     if dxy:
+        dxy_price = str(dxy["price"])
+        dxy_ema   = str(dxy["ema20"])
+        dxy_trend = dxy["trend"]
         if not dxy["above_ema"] and dxy["trend"] == "FALLING":
             s += 1
             items.append(("DXY Alignment", "pass",
-                           f"DXY {dxy['price']} below 20W EMA {dxy['ema20']} and falling", "+1"))
+                           "DXY " + dxy_price + " below 20W EMA " + dxy_ema + " and falling", "+1"))
         elif dxy["above_ema"] and dxy["trend"] == "RISING":
             items.append(("DXY Headwind", "fail",
-                           f"DXY {dxy['price']} above 20W EMA {dxy['ema20']} and rising", "−1"))
+                           "DXY " + dxy_price + " above 20W EMA " + dxy_ema + " and rising", "−1"))
         else:
             items.append(("DXY Neutral", "warn",
-                           f"DXY {dxy['price']} vs EMA {dxy['ema20']} — mixed", "0"))
+                           "DXY " + dxy_price + " vs EMA " + dxy_ema + " — mixed signal", "0"))
     else:
-        items.append(("DXY", "warn", "Unavailable", "?"))
+        items.append(("DXY", "warn", "Data unavailable", "?"))
 
-    # VIX (not scored but shown)
+    # VIX (shown but not scored)
     if vix:
-        if vix["regime"] == "NORMAL":
+        vix_str = str(vix["value"])
+        reg     = vix["regime"]
+        if reg == "NORMAL":
             items.append(("VIX Regime", "pass",
-                           f"VIX {vix['value']} — normal environment", "✓"))
-        elif vix["regime"] == "CRISIS":
+                           "VIX " + vix_str + " — normal environment, trade freely", "✓"))
+        elif reg == "CRISIS":
             items.append(("VIX Crisis", "fail",
-                           f"VIX {vix['value']} — PAUSE ALL TRADING", "✗"))
+                           "VIX " + vix_str + " — PAUSE ALL TRADING", "✗"))
         else:
             items.append(("VIX Elevated", "warn",
-                           f"VIX {vix['value']} — reduce size 25%", "!"))
+                           "VIX " + vix_str + " — reduce position size 25%", "!"))
+    else:
+        items.append(("VIX", "warn", "Data unavailable", "?"))
 
-    # Options (max 2)
-    if opts and not opts.get("error"):
-        if gold:
-            pw_dist  = abs(gold["price"] - opts["put_wall"])
-            cw_dist  = abs(gold["price"] - opts["call_wall"])
-            near_pct = min(pw_dist, cw_dist) / gold["price"] * 100
-            if near_pct <= 0.5:
-                s += 1
-                items.append(("Wall Proximity", "pass",
-                               f"Price within 0.5% of key wall", "+1"))
-            else:
-                items.append(("Wall Proximity", "fail",
-                               f"Price {round(min(pw_dist,cw_dist),1)} from nearest wall", "0"))
-        items.append(("Wall OI", "info",
-                       "Check OI decay manually each morning", "?"))
-        if opts["pc_ratio"] > 1.3:
+    # Options proximity (max 1)
+    if opts_ok and gold:
+        pw_dist  = abs(gold["price"] - opts["put_wall"])
+        cw_dist  = abs(gold["price"] - opts["call_wall"])
+        near     = min(pw_dist, cw_dist)
+        near_pct = near / gold["price"] * 100
+        if near_pct <= 0.5:
+            s += 1
+            items.append(("Wall Proximity", "pass",
+                           "Price within 0.5% of a key options wall", "+1"))
+        else:
+            items.append(("Wall Proximity", "fail",
+                           "Price $" + str(round(near, 1)) + " from nearest wall", "0"))
+    else:
+        items.append(("Wall Proximity", "warn",
+                       "Options data unavailable — markets may be closed", "?"))
+
+    # P/C Ratio (max 1)
+    if opts_ok:
+        pc = opts["pc_ratio"]
+        if pc > 1.3:
             s += 1
             items.append(("P/C Ratio Bullish", "pass",
-                           f"P/C = {opts['pc_ratio']} — institutions hedging longs", "+1"))
+                           "P/C = " + str(pc) + " — institutions heavily hedging longs", "+1"))
         else:
             items.append(("P/C Ratio", "warn",
-                           f"P/C = {opts['pc_ratio']}", "0"))
+                           "P/C = " + str(pc) + " — no strong put loading signal", "0"))
     else:
-        items.append(("Options Data", "warn", "Markets closed or data error", "?"))
+        items.append(("P/C Ratio", "warn", "Options data unavailable", "?"))
 
-    # Structure (manual — shown as reminders)
+    # OI decay reminder
+    items.append(("Wall OI Decay", "info",
+                   "Check OI at wall strike every morning — decay >25% = reduce size", "?"))
+
+    # Structure reminders
     items.append(("Weekly Structure", "info",
-                   "Check 200W EMA on TradingView each Monday", "?"))
+                   "Check 200W EMA on TradingView each Monday morning", "?"))
     items.append(("4H Structure", "info",
-                   "Check higher highs/lows on 4H chart", "?"))
+                   "Confirm higher highs / higher lows on 4H chart before entry", "?"))
 
-    # VWAP (max 1)
+    # VWAP displacement (max 1)
     if gold and gold["vwap"]:
-        ab = gold["above_vwap"]
         disp = abs(gold["price"] - gold["vwap"])
         if disp >= 5:
             s += 1
             items.append(("VWAP Displacement", "pass",
-                           f"${disp:.1f} displacement — meaningful sweep", "+1"))
+                           "$" + str(round(disp, 1)) + " displacement — meaningful liquidity sweep", "+1"))
         else:
             items.append(("VWAP Displacement", "fail",
-                           f"Only ${disp:.1f} from VWAP — not enough", "0"))
+                           "Only $" + str(round(disp, 1)) + " from VWAP — not a real sweep yet", "0"))
+    else:
+        items.append(("VWAP", "warn", "VWAP data unavailable", "?"))
 
     # Kill zone (max 1)
     if is_kill_zone():
         s += 1
         items.append(("Kill Zone Active", "pass",
-                       "London or New York session active", "+1"))
+                       "London (07–10 UTC) or New York (12–15 UTC) is active now", "+1"))
     else:
         h = datetime.now(pytz.utc).hour
         items.append(("Kill Zone", "fail",
-                       f"UTC {h:02d}:xx — outside London/NY window", "0"))
+                       "UTC " + str(h).zfill(2) + ":xx — outside London and NY windows", "0"))
 
     return min(s, 14), items
 
@@ -832,20 +754,18 @@ def build_chart(gold, opts):
         return None
     try:
         hist = gold["hist"].copy()
-        hist = hist[hist.index.date == hist.index[-1].date()]
-        hist = hist.tail(100)
-
+        today_date = hist.index[-1].date()
+        hist = hist[hist.index.date == today_date].tail(100)
         if hist.empty:
             return None
 
-        # VWAP
         hist["TP"]   = (hist["High"] + hist["Low"] + hist["Close"]) / 3
         hist["TPxV"] = hist["TP"] * hist["Volume"]
-        hist["VWAP"] = hist["TPxV"].cumsum() / hist["Volume"].cumsum()
+        cum_v = hist["Volume"].cumsum()
+        hist["VWAP"] = hist["TPxV"].cumsum() / cum_v.replace(0, float("nan"))
 
         fig = go.Figure()
 
-        # Candles
         fig.add_trace(go.Candlestick(
             x=hist.index,
             open=hist["Open"], high=hist["High"],
@@ -858,7 +778,6 @@ def build_chart(gold, opts):
             line_width=1,
         ))
 
-        # VWAP
         fig.add_trace(go.Scatter(
             x=hist.index, y=hist["VWAP"],
             name="VWAP",
@@ -866,17 +785,20 @@ def build_chart(gold, opts):
             mode="lines",
         ))
 
-        # Walls
-        if opts and not opts.get("error"):
+        opts_ok = opts and not opts.get("error")
+        if opts_ok:
             for lvl, clr, nm in [
-                (opts["put_wall"],  "#00D395", f"Put Wall ${opts['put_wall']:,.0f}"),
-                (opts["call_wall"], "#FF4D6A", f"Call Wall ${opts['call_wall']:,.0f}"),
-                (opts["max_pain"],  "#F0C060", f"Max Pain ${opts['max_pain']:,.0f}"),
+                (opts["put_wall"],  "#00D395",
+                 "Put Wall $" + str(f"{opts['put_wall']:,.0f}")),
+                (opts["call_wall"], "#FF4D6A",
+                 "Call Wall $" + str(f"{opts['call_wall']:,.0f}")),
+                (opts["max_pain"],  "#F0C060",
+                 "Max Pain $" + str(f"{opts['max_pain']:,.0f}")),
             ]:
                 fig.add_hline(
                     y=lvl, line_color=clr,
                     line_width=1.2, line_dash="dash",
-                    annotation_text=f"  {nm}",
+                    annotation_text="  " + nm,
                     annotation_position="left",
                     annotation_font_color=clr,
                     annotation_font_size=10,
@@ -907,7 +829,6 @@ def build_chart(gold, opts):
             height=400,
             hovermode="x unified",
         )
-        fig.update_traces(selector=dict(type="candlestick"), xaxis="x")
         return fig
     except Exception:
         return None
@@ -917,9 +838,9 @@ def build_cot_chart(cot):
     if not cot:
         return None
     try:
-        df = pd.DataFrame(cot["history"]).sort_values("date")
+        df     = pd.DataFrame(cot["history"]).sort_values("date")
         colors = ["#00D395" if v > 0 else "#FF4D6A" for v in df["mm_net"]]
-        fig = go.Figure()
+        fig    = go.Figure()
         fig.add_trace(go.Bar(
             x=df["date"], y=df["mm_net"],
             marker_color=colors,
@@ -944,80 +865,92 @@ def build_cot_chart(cot):
 
 
 # ══════════════════════════════════════════════════════════════
-# MAIN APP
+# MAIN
 # ══════════════════════════════════════════════════════════════
 def main():
     utc_now = datetime.now(pytz.utc)
     in_kz   = is_kill_zone()
-    in_mkt  = is_market_open()
 
-    # ── LOAD ALL DATA ────────────────────────────────────────
-    with st.spinner(""):
-        gold = fetch_gold()
-        opts = fetch_options()
-        cot  = fetch_cot()
-        dxy  = fetch_dxy()
-        vix  = fetch_vix()
+    # ── LOAD DATA ─────────────────────────────────────────────
+    gold = fetch_gold()
+    opts = fetch_options()
+    cot  = fetch_cot()
+    dxy  = fetch_dxy()
+    vix  = fetch_vix()
 
+    opts_ok = opts and not opts.get("error")
     score, score_items = score_setup(gold, opts, cot, dxy, vix)
 
-    # ── DETERMINE OVERALL BIAS ───────────────────────────────
-    bias_str   = cot["bias"]   if cot  else "UNKNOWN"
-    ipi_val    = cot["ipi"]    if cot  else 50
-    vix_val    = vix["value"]  if vix  else 0
-    vix_regime = vix["regime"] if vix  else "UNKNOWN"
+    # ── BIAS ──────────────────────────────────────────────────
+    bias_str   = cot["bias"]    if cot  else "UNKNOWN"
+    ipi_val    = cot["ipi"]     if cot  else 50.0
+    vix_val    = vix["value"]   if vix  else 0
+    vix_regime = vix["regime"]  if vix  else "UNKNOWN"
+    is_bull    = "BULLISH"  in bias_str
+    is_bear    = "BEARISH"  in bias_str
+    vix_crisis = vix_val > 40
 
-    is_bull    = "BULLISH" in bias_str
-    is_bear    = "BEARISH" in bias_str
-    is_neutral = "NEUTRAL" in bias_str or "UNKNOWN" in bias_str
-    vix_crisis = vix_val > 40 if vix else False
+    # ── SAFE VALUE STRINGS ────────────────────────────────────
+    price_now = gold["price"]   if gold else 0.0
+    chg_now   = gold["chg"]     if gold else 0.0
+    chg_pct   = gold["chg_pct"] if gold else 0.0
+    chg_sign  = "+" if chg_now >= 0 else ""
 
-    # ── TOPBAR ───────────────────────────────────────────────
+    vwap_val  = gold["vwap"]       if gold else None
+    above_v   = gold["above_vwap"] if gold else None
+    high_val  = gold["high"]       if gold else None
+    low_val   = gold["low"]        if gold else None
+
+    pw_str = "$" + f"{opts['put_wall']:,.0f}"   if opts_ok else "N/A"
+    cw_str = "$" + f"{opts['call_wall']:,.0f}"  if opts_ok else "N/A"
+    mp_str = "$" + f"{opts['max_pain']:,.0f}"   if opts_ok else "N/A"
+
+    # ── TOPBAR ────────────────────────────────────────────────
     kz_html = (
-        '<span class="kz-on"><span class="live-dot"></span>KILL ZONE</span>'
+        '<span class="kz-on"><span class="live-dot"></span>KILL ZONE ACTIVE</span>'
         if in_kz else
         '<span class="kz-off">● OUTSIDE KILL ZONE</span>'
     )
-    st.markdown(f"""
-    <div class="topbar">
-      <div class="topbar-left">
-        <span class="topbar-logo">🏅 GOLD INSTITUTIONAL EDGE</span>
-        <span class="topbar-version">V2.0</span>
-      </div>
-      <div class="topbar-right">
-        {kz_html}
-        <span class="live-badge">
-          <span class="live-dot"></span>LIVE
-        </span>
-        <span class="topbar-time">{utc_now.strftime('%a %d %b · %H:%M UTC')}</span>
-      </div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(
+        '<div class="topbar">'
+        '<div class="topbar-left">'
+        '<span class="topbar-logo">🏅 GOLD INSTITUTIONAL EDGE</span>'
+        '<span class="topbar-version">V2.0</span>'
+        '</div>'
+        '<div class="topbar-right">'
+        + kz_html +
+        '<span class="live-badge"><span class="live-dot"></span>LIVE</span>'
+        '<span class="topbar-time">'
+        + utc_now.strftime("%a %d %b · %H:%M UTC") +
+        '</span>'
+        '</div>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
 
-    # ── OPEN PAGE WRAPPER ─────────────────────────────────────
     st.markdown('<div class="page">', unsafe_allow_html=True)
 
-    # ── HERO BIAS BANNER ─────────────────────────────────────
-    price_now = gold["price"] if gold else "N/A"
-    chg_now   = gold["chg"]   if gold else 0
-    chg_pct   = gold["chg_pct"] if gold else 0
-    chg_sign  = "+" if chg_now >= 0 else ""
-
+    # ── HERO BANNER ───────────────────────────────────────────
     if vix_crisis:
         hero_class = "hero-bear"
         hero_icon  = "🚨"
         hero_color = "#FF4D6A"
         hero_dir   = "TRADING PAUSED"
-        hero_sub   = "VIX above 40 — crisis regime. No edge in this environment. Wait for VIX to fall below 30."
+        hero_sub   = (
+            "VIX above 40 — crisis regime active. "
+            "No edge exists in this environment. "
+            "Wait for VIX to fall below 30 before resuming."
+        )
     elif is_bull:
         hero_class = "hero-bull"
         hero_icon  = "🟢"
         hero_color = "#00D395"
         hero_dir   = "BULLISH BIAS"
         hero_sub   = (
-            f"COT: Managed Money positioned LONG · IPI = {ipi_val} · "
-            f"Only take BUY setups this week · "
-            f"Wait for Put Wall touch + VWAP reclaim"
+            "COT: Managed Money positioned LONG  ·  "
+            "IPI = " + str(ipi_val) + "  ·  "
+            "Only take BUY setups this week  ·  "
+            "Wait for Put Wall touch + VWAP reclaim"
         )
     elif is_bear:
         hero_class = "hero-bear"
@@ -1025,9 +958,10 @@ def main():
         hero_color = "#FF4D6A"
         hero_dir   = "BEARISH BIAS"
         hero_sub   = (
-            f"COT: Managed Money positioned SHORT · IPI = {ipi_val} · "
-            f"Only take SELL setups this week · "
-            f"Wait for Call Wall touch + VWAP rejection"
+            "COT: Managed Money positioned SHORT  ·  "
+            "IPI = " + str(ipi_val) + "  ·  "
+            "Only take SELL setups this week  ·  "
+            "Wait for Call Wall touch + VWAP rejection"
         )
     else:
         hero_class = "hero-neutral"
@@ -1035,250 +969,302 @@ def main():
         hero_color = "#F0A030"
         hero_dir   = "NEUTRAL — NO TRADES"
         hero_sub   = (
-            f"COT: No clear institutional direction · IPI = {ipi_val} · "
-            f"IPI in neutral zone (45–55) · "
-            f"No new positions this week"
+            "COT: No clear institutional direction  ·  "
+            "IPI = " + str(ipi_val) + "  ·  "
+            "IPI in neutral zone (45–55)  ·  "
+            "No new positions this week"
         )
 
-    opts_ok = opts and not opts.get("error")
-    pw_str  = f"${opts['put_wall']:,.0f}"    if opts_ok else "N/A"
-    cw_str  = f"${opts['call_wall']:,.0f}"   if opts_ok else "N/A"
-    mp_str  = f"${opts['max_pain']:,.0f}"    if opts_ok else "N/A"
+    score_color = (
+        "#00D395" if score >= 9 else
+        "#4A9EDB" if score >= 7 else
+        "#F0A030" if score >= 5 else
+        "#FF4D6A"
+    )
 
-    st.markdown(f"""
-    <div class="{hero_class}">
-      <div class="hero-left">
-        <div class="hero-icon">{hero_icon}</div>
-        <div>
-          <div class="hero-direction" style="color:{hero_color}">{hero_dir}</div>
-          <div class="hero-sub">{hero_sub}</div>
-        </div>
-      </div>
-      <div class="hero-right">
-        <div class="hero-tag">
-          <div class="hero-tag-label">GOLD PRICE</div>
-          <div class="hero-tag-value">${price_now:,.2f}</div>
-        </div>
-        <div class="hero-tag">
-          <div class="hero-tag-label">TODAY</div>
-          <div class="hero-tag-value" style="color:{'#00D395' if chg_now>=0 else '#FF4D6A'}">{chg_sign}{chg_now} ({chg_sign}{chg_pct}%)</div>
-        </div>
-        <div class="hero-tag">
-          <div class="hero-tag-label">IPI SCORE</div>
-          <div class="hero-tag-value">{ipi_val}</div>
-        </div>
-        <div class="hero-tag">
-          <div class="hero-tag-label">SETUP SCORE</div>
-          <div class="hero-tag-value" style="color:{'#00D395' if score>=7 else '#F0A030' if score>=5 else '#FF4D6A'}">{score}/14</div>
-        </div>
-      </div>
-    </div>
-    """, unsafe_allow_html=True)
+    chg_color_hero = "#00D395" if chg_now >= 0 else "#FF4D6A"
+    price_str      = f"${price_now:,.2f}" if price_now else "N/A"
+    chg_str        = chg_sign + str(chg_now) + " (" + chg_sign + str(chg_pct) + "%)"
+
+    st.markdown(
+        '<div class="' + hero_class + '">'
+        '<div class="hero-left">'
+        '<div class="hero-icon">' + hero_icon + '</div>'
+        '<div>'
+        '<div class="hero-direction" style="color:' + hero_color + '">' + hero_dir + '</div>'
+        '<div class="hero-sub">' + hero_sub + '</div>'
+        '</div>'
+        '</div>'
+        '<div class="hero-right">'
+        '<div class="hero-tag">'
+        '<div class="hero-tag-label">GOLD PRICE</div>'
+        '<div class="hero-tag-value">' + price_str + '</div>'
+        '</div>'
+        '<div class="hero-tag">'
+        '<div class="hero-tag-label">TODAY</div>'
+        '<div class="hero-tag-value" style="color:' + chg_color_hero + '">' + chg_str + '</div>'
+        '</div>'
+        '<div class="hero-tag">'
+        '<div class="hero-tag-label">IPI SCORE</div>'
+        '<div class="hero-tag-value">' + str(ipi_val) + '</div>'
+        '</div>'
+        '<div class="hero-tag">'
+        '<div class="hero-tag-label">SETUP SCORE</div>'
+        '<div class="hero-tag-value" style="color:' + score_color + '">' + str(score) + '/14</div>'
+        '</div>'
+        '</div>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
 
     # ── SCORE BAR ─────────────────────────────────────────────
     score_pct = round((score / 14) * 100)
     if score >= 9:
         s_color  = "#00D395"
         s_text   = "ELITE SETUP"
-        s_class  = "pass"
         s_bg     = "rgba(0,211,149,0.12)"
         s_brd    = "rgba(0,211,149,0.3)"
+        s_extra  = (
+            '<div class="score-verdict" '
+            'style="background:rgba(0,211,149,0.1);'
+            'border:1px solid rgba(0,211,149,0.25);color:#00D395">'
+            'SIZE UP 1.5×</div>'
+        )
     elif score >= 7:
         s_color  = "#4A9EDB"
         s_text   = "VALID — TRADE IT"
-        s_class  = "pass"
         s_bg     = "rgba(74,158,219,0.12)"
         s_brd    = "rgba(74,158,219,0.3)"
+        s_extra  = ""
     elif score >= 5:
         s_color  = "#F0A030"
         s_text   = "MARGINAL — SKIP"
-        s_class  = "warn"
         s_bg     = "rgba(240,160,48,0.12)"
         s_brd    = "rgba(240,160,48,0.3)"
+        s_extra  = ""
     else:
         s_color  = "#FF4D6A"
         s_text   = "NO SETUP — WAIT"
-        s_class  = "fail"
         s_bg     = "rgba(255,77,106,0.12)"
         s_brd    = "rgba(255,77,106,0.3)"
+        s_extra  = ""
 
-    st.markdown(f"""
-    <div class="score-bar-wrap">
-      <div>
-        <div class="mc-label" style="margin-bottom:4px">CONFLUENCE SCORE</div>
-        <div class="score-num-big" style="color:{s_color}">{score}</div>
-      </div>
-      <div class="score-label-area">
-        <div class="score-title">Out of 14 possible points</div>
-        <div class="score-bar-bg">
-          <div class="score-bar-fill"
-               style="width:{score_pct}%;background:{s_color}"></div>
-        </div>
-      </div>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
-        <div class="score-verdict"
-             style="background:{s_bg};border:1px solid {s_brd};color:{s_color}">
-          {s_text}
-        </div>
-        {'<div class="score-verdict" style="background:rgba(0,211,149,0.1);border:1px solid rgba(0,211,149,0.25);color:#00D395">SIZE UP 1.5×</div>' if score >= 9 else ''}
-      </div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(
+        '<div class="score-bar-wrap">'
+        '<div>'
+        '<div class="mc-label" style="margin-bottom:4px">CONFLUENCE SCORE</div>'
+        '<div class="score-num-big" style="color:' + s_color + '">' + str(score) + '</div>'
+        '</div>'
+        '<div class="score-label-area">'
+        '<div class="score-title">Out of 14 possible points</div>'
+        '<div class="score-bar-bg">'
+        '<div class="score-bar-fill" style="width:' + str(score_pct) + '%;background:' + s_color + '"></div>'
+        '</div>'
+        '</div>'
+        '<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">'
+        '<div class="score-verdict" style="background:' + s_bg + ';border:1px solid ' + s_brd + ';color:' + s_color + '">'
+        + s_text +
+        '</div>'
+        + s_extra +
+        '</div>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
 
-    # ── TOP METRIC STRIP ──────────────────────────────────────
-    st.markdown('<div class="sec-head">Live Market Data</div>',
-                unsafe_allow_html=True)
-
-    vwap_val  = gold["vwap"]   if gold and gold["vwap"] else None
-    above_v   = gold["above_vwap"] if gold else None
-    high_val  = gold["high"]   if gold else None
-    low_val   = gold["low"]    if gold else None
+    # ── ROW 1 — 6 METRIC CARDS ───────────────────────────────
+    st.markdown(
+        '<div class="sec-head">Live Market Data</div>',
+        unsafe_allow_html=True,
+    )
 
     vwap_color = "mc-green" if above_v else "mc-red"
     vwap_sub   = "Price above VWAP ↑" if above_v else "Price below VWAP ↓"
     vwap_top   = "bull" if above_v else "bear"
-    price_top  = "bull" if (chg_now >= 0 if gold else False) else "bear"
+    price_top  = "bull" if chg_now >= 0 else "bear"
 
-    dxy_color = "mc-red" if (dxy and dxy["above_ema"]) else "mc-green"
-    dxy_top   = "bear"   if (dxy and dxy["above_ema"]) else "bull"
+    vwap_str   = ("$" + f"{vwap_val:,.2f}") if vwap_val else "N/A"
+    high_str   = ("$" + f"{high_val:,.0f}") if high_val else "N/A"
+    low_str    = ("$" + f"{low_val:,.0f}")  if low_val  else "N/A"
+    range_str  = ("$" + f"{round(high_val - low_val, 1):,.1f}") if (high_val and low_val) else "N/A"
 
-    vix_color = (
-        "mc-green" if vix_regime == "NORMAL" else
-        "mc-red"   if vix_regime in ("HIGH","CRISIS") else
-        "mc-amber"
+    pw_dist_str = ""
+    cw_dist_str = ""
+    if gold and opts_ok:
+        pw_dist_str = "$" + f"{abs(gold['price'] - opts['put_wall']):,.0f}" + " from price"
+        cw_dist_str = "$" + f"{abs(opts['call_wall'] - gold['price']):,.0f}" + " from price"
+
+    st.markdown(
+        '<div class="metric-row">'
+
+        '<div class="metric-card ' + price_top + '">'
+        '<div class="mc-label">Gold Price</div>'
+        '<div class="mc-value mc-gold">$' + f"{price_now:,.2f}" + '</div>'
+        '<div class="mc-sub" style="color:' + ("#00D395" if chg_now >= 0 else "#FF4D6A") + '">'
+        + chg_sign + str(chg_now) + " (" + chg_sign + str(chg_pct) + "%) today"
+        '</div>'
+        '</div>'
+
+        '<div class="metric-card ' + vwap_top + '">'
+        '<div class="mc-label">VWAP</div>'
+        '<div class="mc-value ' + vwap_color + '">' + vwap_str + '</div>'
+        '<div class="mc-sub">' + vwap_sub + '</div>'
+        '</div>'
+
+        '<div class="metric-card bull">'
+        '<div class="mc-label">Put Wall — Support</div>'
+        '<div class="mc-value mc-green">' + pw_str + '</div>'
+        '<div class="mc-sub">' + (pw_dist_str if pw_dist_str else "Options data unavailable") + '</div>'
+        '</div>'
+
+        '<div class="metric-card bear">'
+        '<div class="mc-label">Call Wall — Resistance</div>'
+        '<div class="mc-value mc-red">' + cw_str + '</div>'
+        '<div class="mc-sub">' + (cw_dist_str if cw_dist_str else "Options data unavailable") + '</div>'
+        '</div>'
+
+        '<div class="metric-card gold">'
+        '<div class="mc-label">Max Pain</div>'
+        '<div class="mc-value mc-gold">' + mp_str + '</div>'
+        '<div class="mc-sub">Weekly expiry price magnet</div>'
+        '</div>'
+
+        '<div class="metric-card amber">'
+        '<div class="mc-label">Day Range</div>'
+        '<div class="mc-value mc-amber">' + low_str + ' – ' + high_str + '</div>'
+        '<div class="mc-sub">Range: ' + range_str + '</div>'
+        '</div>'
+
+        '</div>',
+        unsafe_allow_html=True,
     )
-    vix_top = (
-        "bull" if vix_regime == "NORMAL" else
-        "bear" if vix_regime in ("HIGH","CRISIS") else
-        "amber"
-    )
 
-    st.markdown(f"""
-    <div class="metric-row">
-      <div class="metric-card {price_top}">
-        <div class="mc-label">Gold Price</div>
-        <div class="mc-value mc-gold">${price_now:,.2f}</div>
-        <div class="mc-sub" style="color:{'#00D395' if chg_now>=0 else '#FF4D6A'}">
-          {chg_sign}{chg_now} ({chg_sign}{chg_pct}%) today
-        </div>
-      </div>
-      <div class="metric-card {vwap_top}">
-        <div class="mc-label">VWAP</div>
-        <div class="mc-value {vwap_color}">${f"{vwap_val:,.2f}" if vwap_val else "N/A"}</div>
-        <div class="mc-sub">{vwap_sub}</div>
-      </div>
-      <div class="metric-card bull">
-        <div class="mc-label">Put Wall — Support</div>
-        <div class="mc-value mc-green">{pw_str}</div>
-        <div class="mc-sub">
-          {f"${abs(gold['price'] - opts['put_wall']):,.0f} from price" if gold and opts_ok else "Options data unavailable"}
-        </div>
-      </div>
-      <div class="metric-card bear">
-        <div class="mc-label">Call Wall — Resistance</div>
-        <div class="mc-value mc-red">{cw_str}</div>
-        <div class="mc-sub">
-          {f"${abs(opts['call_wall'] - gold['price']):,.0f} from price" if gold and opts_ok else "Options data unavailable"}
-        </div>
-      </div>
-      <div class="metric-card gold">
-        <div class="mc-label">Max Pain</div>
-        <div class="mc-value mc-gold">{mp_str}</div>
-        <div class="mc-sub">Weekly expiry magnet</div>
-      </div>
-      <div class="metric-card amber">
-        <div class="mc-label">Day Range</div>
-        <div class="mc-value mc-amber">
-          ${f"{gold['low']:,.0f}" if gold else "N/A"}–${f"{gold['high']:,.0f}" if gold else "N/A"}
-        </div>
-        <div class="mc-sub">
-          Range: ${f"{round(gold['high']-gold['low'],1):,.1f}" if gold else "N/A"}
-        </div>
-      </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # ── SECOND METRIC ROW ─────────────────────────────────────
+    # ── ROW 2 — 4 METRIC CARDS ───────────────────────────────
     ipi_color = (
         "mc-green" if ipi_val > 55 else
         "mc-red"   if ipi_val < 45 else
         "mc-amber"
     )
-    cot_chg   = cot["change"] if cot else 0
-    cot_date  = cot["date"]   if cot else "N/A"
-    pc_val    = opts["pc_ratio"] if opts_ok else None
-    pc_color  = "mc-green" if (pc_val and pc_val > 1.0) else "mc-amber"
+    ipi_top = (
+        "bull" if ipi_val > 55 else
+        "bear" if ipi_val < 45 else
+        "amber"
+    )
+    cot_chg  = cot["change"] if cot else 0
+    cot_date = cot["date"]   if cot else "N/A"
+    cot_arr  = "↑" if cot_chg > 0 else "↓"
+    cot_col  = "mc-green" if cot_chg > 0 else "mc-red"
+    cot_top  = "bull" if cot_chg > 0 else "bear"
 
-    st.markdown(f"""
-    <div class="metric-row-4">
-      <div class="metric-card {'bull' if ipi_val>55 else 'bear' if ipi_val<45 else 'amber'}">
-        <div class="mc-label">IPI Score</div>
-        <div class="mc-value {ipi_color}">{ipi_val}</div>
-        <div class="mc-sub">{bias_str} · as of {cot_date}</div>
-      </div>
-      <div class="metric-card {'bull' if cot_chg>0 else 'bear'}">
-        <div class="mc-label">COT Weekly Change</div>
-        <div class="mc-value {'mc-green' if cot_chg>0 else 'mc-red'}">
-          {'↑' if cot_chg>0 else '↓'} {abs(cot_chg):,}
-        </div>
-        <div class="mc-sub">Managed Money net contracts</div>
-      </div>
-      <div class="metric-card {vix_top}">
-        <div class="mc-label">VIX Regime</div>
-        <div class="mc-value {vix_color}">{vix_val if vix else 'N/A'}</div>
-        <div class="mc-sub">{vix_regime} — {'normal, trade freely' if vix_regime=='NORMAL' else 'reduce size 25%' if vix_regime=='ELEVATED' else 'reduce size 50%' if vix_regime=='HIGH' else 'PAUSE ALL TRADING'}</div>
-      </div>
-      <div class="metric-card {dxy_top}">
-        <div class="mc-label">DXY — US Dollar</div>
-        <div class="mc-value {dxy_color}">{dxy['price'] if dxy else 'N/A'}</div>
-        <div class="mc-sub">{'Above' if dxy and dxy['above_ema'] else 'Below'} 20W EMA {f'({dxy[\"ema20\"]})' if dxy else ''} · {dxy['trend'] if dxy else ''}</div>
-      </div>
-    </div>
-    """, unsafe_allow_html=True)
+    vix_color = (
+        "mc-green" if vix_regime == "NORMAL"   else
+        "mc-red"   if vix_regime in ("HIGH", "CRISIS") else
+        "mc-amber"
+    )
+    vix_top_c = (
+        "bull"  if vix_regime == "NORMAL" else
+        "bear"  if vix_regime in ("HIGH", "CRISIS") else
+        "amber"
+    )
+    vix_sub = (
+        "Normal — trade freely"     if vix_regime == "NORMAL"   else
+        "Elevated — reduce size 25%" if vix_regime == "ELEVATED" else
+        "High — reduce size 50%"     if vix_regime == "HIGH"     else
+        "CRISIS — PAUSE ALL TRADING"
+    )
+
+    # Build DXY strings without backslashes in f-string
+    if dxy:
+        dxy_price_str = str(dxy["price"])
+        dxy_ema_str   = str(dxy["ema20"])
+        dxy_trend_str = dxy["trend"]
+        dxy_above_str = "Above" if dxy["above_ema"] else "Below"
+        dxy_sub_str   = dxy_above_str + " 20W EMA (" + dxy_ema_str + ") · " + dxy_trend_str
+        dxy_val_str   = dxy_price_str
+        dxy_color_str = "mc-red" if dxy["above_ema"] else "mc-green"
+        dxy_top_str   = "bear"   if dxy["above_ema"] else "bull"
+    else:
+        dxy_val_str   = "N/A"
+        dxy_sub_str   = "Data unavailable"
+        dxy_color_str = "mc-amber"
+        dxy_top_str   = "amber"
+
+    st.markdown(
+        '<div class="metric-row-4">'
+
+        '<div class="metric-card ' + ipi_top + '">'
+        '<div class="mc-label">IPI Score</div>'
+        '<div class="mc-value ' + ipi_color + '">' + str(ipi_val) + '</div>'
+        '<div class="mc-sub">' + bias_str + ' · as of ' + cot_date + '</div>'
+        '</div>'
+
+        '<div class="metric-card ' + cot_top + '">'
+        '<div class="mc-label">COT Weekly Change</div>'
+        '<div class="mc-value ' + cot_col + '">' + cot_arr + ' ' + f"{abs(cot_chg):,}" + '</div>'
+        '<div class="mc-sub">Managed Money net contracts</div>'
+        '</div>'
+
+        '<div class="metric-card ' + vix_top_c + '">'
+        '<div class="mc-label">VIX Regime</div>'
+        '<div class="mc-value ' + vix_color + '">' + str(vix_val if vix else "N/A") + '</div>'
+        '<div class="mc-sub">' + vix_sub + '</div>'
+        '</div>'
+
+        '<div class="metric-card ' + dxy_top_str + '">'
+        '<div class="mc-label">DXY — US Dollar</div>'
+        '<div class="mc-value ' + dxy_color_str + '">' + dxy_val_str + '</div>'
+        '<div class="mc-sub">' + dxy_sub_str + '</div>'
+        '</div>'
+
+        '</div>',
+        unsafe_allow_html=True,
+    )
 
     # ── TWO COLUMN LAYOUT ─────────────────────────────────────
     col1, col2 = st.columns([3, 2], gap="medium")
 
     with col1:
-        # CHART
-        st.markdown('<div class="sec-head">Price Chart — 5 Min with Key Levels</div>',
-                    unsafe_allow_html=True)
+        st.markdown(
+            '<div class="sec-head">Price Chart — 5 Min Candles with Key Levels</div>',
+            unsafe_allow_html=True,
+        )
         fig = build_chart(gold, opts)
         if fig:
             st.plotly_chart(fig, use_container_width=True,
                             config={"displayModeBar": False})
         else:
-            st.markdown("""
-            <div class="info-strip">
-              ⏸ Chart unavailable — markets may be closed
-              or data provider is slow. Refresh in a moment.
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(
+                '<div class="info-strip">'
+                '⏸ Chart unavailable — markets may be closed. '
+                'Click Refresh All Data to try again.'
+                '</div>',
+                unsafe_allow_html=True,
+            )
 
-        # COT CHART
-        st.markdown('<div class="sec-head">COT — Managed Money Net Position (8 Weeks)</div>',
-                    unsafe_allow_html=True)
+        st.markdown(
+            '<div class="sec-head">COT — Managed Money Net Position (8 Weeks)</div>',
+            unsafe_allow_html=True,
+        )
         fig2 = build_cot_chart(cot)
         if fig2:
             st.plotly_chart(fig2, use_container_width=True,
                             config={"displayModeBar": False})
         else:
-            st.markdown("""
-            <div class="info-strip">
-              COT data unavailable. Try refreshing.
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(
+                '<div class="info-strip">COT chart unavailable. Try refreshing.</div>',
+                unsafe_allow_html=True,
+            )
 
     with col2:
         # TRADE LEVELS
-        st.markdown('<div class="sec-head">Trade Levels — Current Setup</div>',
-                    unsafe_allow_html=True)
+        st.markdown(
+            '<div class="sec-head">Trade Levels — Current Setup</div>',
+            unsafe_allow_html=True,
+        )
 
         if gold and opts_ok:
-            p     = gold["price"]
-            v     = gold["vwap"] or p
-            atr_e = 28.0  # estimated daily ATR — user should check chart
-            stop_dist = round(1.5 * atr_e, 2)
+            p         = gold["price"]
+            atr_est   = 28.0
+            stop_dist = round(1.5 * atr_est, 2)
 
             if is_bull:
                 entry = p
@@ -1286,189 +1272,226 @@ def main():
                 risk  = round(entry - stop, 2)
                 tp1   = round(entry + risk * 1.0, 2)
                 tp2   = round(entry + risk * 2.0, 2)
-                tp3   = round(opts["max_pain"],    2)
-                tp4   = round(opts["call_wall"],   2)
-                dot_entry = "#FFFFFF"
-                dot_stop  = "#FF4D6A"
+                tp3   = round(opts["max_pain"],   2)
+                tp4   = round(opts["call_wall"],  2)
+                header_str = "🟢 LONG SETUP (BUY) · Risk = $" + f"{risk:,.2f}" + " per unit"
             else:
                 entry = p
                 stop  = round(opts["call_wall"] + stop_dist, 2)
                 risk  = round(stop - entry, 2)
                 tp1   = round(entry - risk * 1.0, 2)
                 tp2   = round(entry - risk * 2.0, 2)
-                tp3   = round(opts["max_pain"],    2)
-                tp4   = round(opts["put_wall"],    2)
-                dot_entry = "#FFFFFF"
-                dot_stop  = "#FF4D6A"
+                tp3   = round(opts["max_pain"],   2)
+                tp4   = round(opts["put_wall"],   2)
+                header_str = "🔴 SHORT SETUP (SELL) · Risk = $" + f"{risk:,.2f}" + " per unit"
 
             levels = [
-                (dot_stop,  "#FF4D6A", "STOP LOSS",
-                 f"${stop:,.2f}", f"1.5× ATR below Put Wall · Risk = ${risk:,.2f}"),
-                (dot_entry, "#FFFFFF", "ENTRY",
-                 f"${entry:,.2f}", "Current price after VWAP reclaim"),
-                ("#00D395", "#00D395", "TP 1  — Close 40%",
-                 f"${tp1:,.2f}", "1:1 R/R · Move SL to entry"),
-                ("#00D395", "#4A9EDB", "TP 2  — Close 30%",
-                 f"${tp2:,.2f}", "1:2 R/R · Move SL to TP1"),
-                ("#00D395", "#F0C060", "TP 3  — Close 20%",
-                 f"${tp3:,.2f}", "Max Pain level · Move SL to TP2"),
-                ("#00D395", "#C9922A", "TP 4  — Close 10%",
-                 f"${tp4:,.2f}", "Opposite wall · Full move target"),
+                ("#FF4D6A", "STOP LOSS",
+                 "$" + f"{stop:,.2f}",
+                 "1.5× ATR below Put Wall · Risk = $" + f"{risk:,.2f}"),
+                ("#FFFFFF", "ENTRY",
+                 "$" + f"{entry:,.2f}",
+                 "Current price — enter after VWAP reclaim"),
+                ("#00D395", "TP 1 — Close 40%",
+                 "$" + f"{tp1:,.2f}",
+                 "1:1 R/R · Move stop loss to entry (breakeven)"),
+                ("#4A9EDB", "TP 2 — Close 30%",
+                 "$" + f"{tp2:,.2f}",
+                 "1:2 R/R · Move stop loss to TP1"),
+                ("#F0C060", "TP 3 — Close 20%",
+                 "$" + f"{tp3:,.2f}",
+                 "Max Pain level · Move stop loss to TP2"),
+                ("#C9922A", "TP 4 — Close 10%",
+                 "$" + f"{tp4:,.2f}",
+                 "Opposite options wall · Full institutional move"),
             ]
-            rows = ""
-            for _, dot_c, name, price_str, desc in levels:
-                rows += f"""
-                <div class="trade-level-row">
-                  <div class="tl-left">
-                    <div class="tl-dot" style="background:{dot_c}"></div>
-                    <div>
-                      <div class="tl-name">{name}</div>
-                      <div class="tl-desc">{desc}</div>
-                    </div>
-                  </div>
-                  <div class="tl-price">{price_str}</div>
-                </div>"""
 
-            st.markdown(f"""
-            <div class="trade-panel">
-              <div class="trade-panel-header">
-                {'🟢 LONG SETUP (BUY)' if is_bull else '🔴 SHORT SETUP (SELL)' if is_bear else '⚪ NEUTRAL — NO TRADE'}
-                &nbsp;&nbsp;·&nbsp;&nbsp; Risk = ${risk:,.2f} per unit
-              </div>
-              {rows}
-            </div>
-            """, unsafe_allow_html=True)
+            rows_html = ""
+            for dot_c, name, price_str_lv, desc in levels:
+                rows_html += (
+                    '<div class="trade-level-row">'
+                    '<div class="tl-left">'
+                    '<div class="tl-dot" style="background:' + dot_c + '"></div>'
+                    '<div>'
+                    '<div class="tl-name">' + name + '</div>'
+                    '<div class="tl-desc">' + desc + '</div>'
+                    '</div>'
+                    '</div>'
+                    '<div class="tl-price">' + price_str_lv + '</div>'
+                    '</div>'
+                )
 
-            st.markdown("""
-            <div class="info-strip">
-              ⚠️ Stop distance uses estimated ATR of $28.
-              Check your chart for the real 14-period Daily ATR
-              and adjust accordingly.
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(
+                '<div class="trade-panel">'
+                '<div class="trade-panel-header">' + header_str + '</div>'
+                + rows_html +
+                '</div>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                '<div class="info-strip">'
+                '⚠️ Stop distance uses estimated ATR of $28. '
+                'Check your chart for the real 14-period Daily ATR and adjust.'
+                '</div>',
+                unsafe_allow_html=True,
+            )
         else:
-            st.markdown("""
-            <div class="info-strip">
-              Trade levels require live price and options data.
-              Options data is available Mon–Fri during US market hours.
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown(
+                '<div class="info-strip">'
+                'Trade levels require live price and options data. '
+                'Options data is available Mon–Fri during US market hours (14:30–21:00 UTC).'
+                '</div>',
+                unsafe_allow_html=True,
+            )
 
         # CONFLUENCE CHECKLIST
-        st.markdown('<div class="sec-head">Confluence Checklist</div>',
-                    unsafe_allow_html=True)
+        st.markdown(
+            '<div class="sec-head">Confluence Checklist</div>',
+            unsafe_allow_html=True,
+        )
 
-        rows_html = ""
+        trade_verdict = "TRADE ✓" if score >= 7 else "DO NOT TRADE ✗"
+        rows_c = ""
         for name, state, detail, pts in score_items:
-            icon = "✅" if state == "pass" else "❌" if state == "fail" else "⚠️" if state == "warn" else "ℹ️"
-            rows_html += f"""
-            <div class="check-item">
-              <div class="check-icon">{icon}</div>
-              <div class="check-body">
-                <div class="check-name {state}">{name}</div>
-                <div class="check-detail">{detail}</div>
-              </div>
-              <div class="check-right {state}">{pts}</div>
-            </div>"""
+            icon = (
+                "✅" if state == "pass" else
+                "❌" if state == "fail" else
+                "⚠️" if state == "warn" else
+                "ℹ️"
+            )
+            rows_c += (
+                '<div class="check-item">'
+                '<div class="check-icon">' + icon + '</div>'
+                '<div class="check-body">'
+                '<div class="check-name ' + state + '">' + name + '</div>'
+                '<div class="check-detail">' + detail + '</div>'
+                '</div>'
+                '<div class="check-right ' + state + '">' + pts + '</div>'
+                '</div>'
+            )
 
-        st.markdown(f"""
-        <div class="checklist">
-          <div class="checklist-header">Score: {score}/14 — {'TRADE ✓' if score>=7 else 'DO NOT TRADE ✗'}</div>
-          {rows_html}
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(
+            '<div class="checklist">'
+            '<div class="checklist-header">Score: ' + str(score) + '/14 — ' + trade_verdict + '</div>'
+            + rows_c +
+            '</div>',
+            unsafe_allow_html=True,
+        )
 
     # ── OPTIONS DETAIL ROW ────────────────────────────────────
-    st.markdown('<div class="sec-head">Options Intelligence</div>',
-                unsafe_allow_html=True)
+    st.markdown(
+        '<div class="sec-head">Options Intelligence</div>',
+        unsafe_allow_html=True,
+    )
 
     col3, col4, col5, col6 = st.columns(4, gap="medium")
 
     with col3:
         if opts_ok:
-            pc  = opts["pc_ratio"]
-            if   pc > 1.3: pc_sent = "Heavy put loading — bullish"
-            elif pc > 1.0: pc_sent = "Mild put premium — normal"
-            elif pc > 0.7: pc_sent = "Balanced"
-            else:          pc_sent = "Call-heavy — caution"
-            st.markdown(f"""
-            <div class="metric-card {'bull' if pc>1.0 else 'amber'}">
-              <div class="mc-label">Put/Call Ratio</div>
-              <div class="mc-value {'mc-green' if pc>1.0 else 'mc-amber'}">{pc}</div>
-              <div class="mc-sub">{pc_sent}</div>
-            </div>""", unsafe_allow_html=True)
+            pc = opts["pc_ratio"]
+            if   pc > 1.3: pc_sent = "Heavy put loading — institutions hedging longs"
+            elif pc > 1.0: pc_sent = "Mild put premium — normal hedging"
+            elif pc > 0.7: pc_sent = "Balanced put/call ratio"
+            else:          pc_sent = "Call-heavy — speculative buying"
+            pc_col = "mc-green" if pc > 1.0 else "mc-amber"
+            pc_top = "bull"     if pc > 1.0 else "amber"
+            st.markdown(
+                '<div class="metric-card ' + pc_top + '">'
+                '<div class="mc-label">Put / Call Ratio</div>'
+                '<div class="mc-value ' + pc_col + '">' + str(pc) + '</div>'
+                '<div class="mc-sub">' + pc_sent + '</div>'
+                '</div>',
+                unsafe_allow_html=True,
+            )
         else:
-            st.markdown("""
-            <div class="metric-card">
-              <div class="mc-label">Put/Call Ratio</div>
-              <div class="mc-value mc-amber">N/A</div>
-            </div>""", unsafe_allow_html=True)
+            st.markdown(
+                '<div class="metric-card">'
+                '<div class="mc-label">Put / Call Ratio</div>'
+                '<div class="mc-value mc-amber">N/A</div>'
+                '<div class="mc-sub">Options data unavailable</div>'
+                '</div>',
+                unsafe_allow_html=True,
+            )
 
     with col4:
         if opts_ok:
-            st.markdown(f"""
-            <div class="metric-card gold">
-              <div class="mc-label">Options Expiry</div>
-              <div class="mc-value mc-gold" style="font-size:15px">{opts['expiry']}</div>
-              <div class="mc-sub">Nearest weekly contract</div>
-            </div>""", unsafe_allow_html=True)
+            st.markdown(
+                '<div class="metric-card gold">'
+                '<div class="mc-label">Options Expiry</div>'
+                '<div class="mc-value mc-gold" style="font-size:15px">' + opts["expiry"] + '</div>'
+                '<div class="mc-sub">Nearest weekly GLD contract</div>'
+                '</div>',
+                unsafe_allow_html=True,
+            )
         else:
-            st.markdown("""
-            <div class="metric-card">
-              <div class="mc-label">Options Expiry</div>
-              <div class="mc-value mc-amber">N/A</div>
-            </div>""", unsafe_allow_html=True)
+            st.markdown(
+                '<div class="metric-card">'
+                '<div class="mc-label">Options Expiry</div>'
+                '<div class="mc-value mc-amber">N/A</div>'
+                '</div>',
+                unsafe_allow_html=True,
+            )
 
     with col5:
         if opts_ok:
-            st.markdown(f"""
-            <div class="metric-card blue">
-              <div class="mc-label">GLD→XAUUSD Mult</div>
-              <div class="mc-value mc-blue">{opts['mult']}×</div>
-              <div class="mc-sub">Live conversion factor</div>
-            </div>""", unsafe_allow_html=True)
+            st.markdown(
+                '<div class="metric-card blue">'
+                '<div class="mc-label">GLD → XAUUSD Multiplier</div>'
+                '<div class="mc-value mc-blue">' + str(opts["mult"]) + '×</div>'
+                '<div class="mc-sub">Live conversion factor</div>'
+                '</div>',
+                unsafe_allow_html=True,
+            )
         else:
-            st.markdown("""
-            <div class="metric-card">
-              <div class="mc-label">Multiplier</div>
-              <div class="mc-value mc-amber">N/A</div>
-            </div>""", unsafe_allow_html=True)
+            st.markdown(
+                '<div class="metric-card">'
+                '<div class="mc-label">GLD Multiplier</div>'
+                '<div class="mc-value mc-amber">N/A</div>'
+                '</div>',
+                unsafe_allow_html=True,
+            )
 
     with col6:
+        h_now = utc_now.hour
         if in_kz:
-            kz_msg   = "ACTIVE NOW"
-            kz_col   = "mc-green"
-            kz_top   = "bull"
-            kz_sub   = "London 07–10 or NY 12–15 UTC"
+            kz_msg = "ACTIVE NOW"
+            kz_col = "mc-green"
+            kz_top = "bull"
+            kz_sub = "London 07–10 UTC or NY 12–15 UTC"
         else:
-            h_now = utc_now.hour
+            kz_top = "amber"
+            kz_col = "mc-amber"
             if h_now < 7:
-                mins = (7 - h_now) * 60
-                kz_msg = f"London in ~{mins}min"
+                kz_msg = "London in ~" + str((7 - h_now) * 60) + "min"
+                kz_sub = "Next kill zone: London 07:00 UTC"
             elif 10 <= h_now < 12:
-                mins = (12 - h_now) * 60
-                kz_msg = f"NY open in ~{mins}min"
+                kz_msg = "NY in ~" + str((12 - h_now) * 60) + "min"
+                kz_sub = "Next kill zone: New York 12:00 UTC"
             elif h_now >= 15:
-                kz_msg = "Next: Tomorrow 07:00"
+                kz_msg = "Tomorrow 07:00"
+                kz_sub = "All kill zones closed for today"
             else:
                 kz_msg = "Inactive"
-            kz_col = "mc-amber"
-            kz_top = "amber"
-            kz_sub = "Outside London/NY window"
-        st.markdown(f"""
-        <div class="metric-card {kz_top}">
-          <div class="mc-label">Kill Zone</div>
-          <div class="mc-value {kz_col}" style="font-size:15px">{kz_msg}</div>
-          <div class="mc-sub">{kz_sub}</div>
-        </div>""", unsafe_allow_html=True)
+                kz_sub = "Outside London and NY windows"
 
-    # ── REFRESH BUTTON + LAST UPDATED ─────────────────────────
-    st.markdown('<div class="sec-head">Controls</div>',
-                unsafe_allow_html=True)
+        st.markdown(
+            '<div class="metric-card ' + kz_top + '">'
+            '<div class="mc-label">Kill Zone Status</div>'
+            '<div class="mc-value ' + kz_col + '" style="font-size:15px">' + kz_msg + '</div>'
+            '<div class="mc-sub">' + kz_sub + '</div>'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+
+    # ── REFRESH CONTROLS ──────────────────────────────────────
+    st.markdown(
+        '<div class="sec-head">Controls</div>',
+        unsafe_allow_html=True,
+    )
 
     c1, c2, c3, c4 = st.columns([1, 1, 1, 3])
     with c1:
-        if st.button("🔄 Refresh All Data"):
+        if st.button("🔄 Refresh All"):
             fetch_gold.clear()
             fetch_options.clear()
             fetch_cot.clear()
@@ -1484,29 +1507,30 @@ def main():
             fetch_cot.clear()
             st.rerun()
     with c4:
-        st.markdown(f"""
-        <div style="padding:8px 0;font-family:var(--mono);
-             font-size:10px;color:var(--text3)">
-          Last loaded: {utc_now.strftime('%H:%M:%S UTC')} ·
-          Price refreshes every 60s ·
-          Options every 5min ·
-          COT every hour
-        </div>
-        """, unsafe_allow_html=True)
+        st.markdown(
+            '<div style="padding:8px 0;font-family:var(--mono);font-size:10px;color:var(--text3)">'
+            'Loaded: ' + utc_now.strftime("%H:%M:%S UTC") +
+            ' · Price refreshes every 60s'
+            ' · Options every 5min'
+            ' · COT every hour'
+            '</div>',
+            unsafe_allow_html=True,
+        )
 
-    # ── FOOTER ───────────────────────────────────────────────
-    st.markdown("""
-    <div class="footer">
-      GOLD INSTITUTIONAL EDGE V2.0 &nbsp;·&nbsp;
-      Data: Yahoo Finance / CFTC Public API &nbsp;·&nbsp;
-      For educational purposes only &nbsp;·&nbsp;
-      Not financial advice
-    </div>
-    """, unsafe_allow_html=True)
+    # ── FOOTER ────────────────────────────────────────────────
+    st.markdown(
+        '<div class="footer">'
+        'GOLD INSTITUTIONAL EDGE V2.0 &nbsp;·&nbsp; '
+        'Data: Yahoo Finance / CFTC Public API &nbsp;·&nbsp; '
+        'For educational purposes only &nbsp;·&nbsp; '
+        'Not financial advice'
+        '</div>',
+        unsafe_allow_html=True,
+    )
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # ── AUTO REFRESH EVERY 60 SECONDS ────────────────────────
+    # ── AUTO REFRESH EVERY 60 SECONDS ─────────────────────────
     time.sleep(60)
     fetch_gold.clear()
     st.rerun()
